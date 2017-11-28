@@ -1,2 +1,2 @@
 # Words with Friends
-We are replicating the game Words with Friends
+We are replicating the popular game, [Words with Friends](https://en.wikipedia.org/wiki/Words_with_Friends). We will be using the [Oxford Dictionary API](https://developer.oxforddictionaries.com/) to determine whether the players use valid words. This Project will be divided into several components. First the Sign In/Sign out of the web app will be handled by Wynston Hsu, Charlye Castro will be in charge of the Game Invitation/Available Players, Ian Figon will take care of the Tiles and Letters and Finally, Christian Hahn will design the overall UI and set up the API. This web app will be using the React js framework.
