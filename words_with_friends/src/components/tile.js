@@ -10,8 +10,8 @@ export default class Tile extends React.Component {
 
     render() {
 
-        let letter = this.props.tiles.letter;
-        let point = this.props.tiles.point;
+        let letter = this.props.randomTile.letter;
+        let point = this.props.randomTile.point;
 
         return (
             <div className="btn">
