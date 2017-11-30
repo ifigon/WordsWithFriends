@@ -37,7 +37,7 @@ export default class SignUpView extends React.Component {
             this.setState({ error: 'Password does not match. Please try again.' });
         }
         if (this.state.displayname === '') {
-            this.setState({error: 'Please provide a valid displayname.'});
+            this.setState({ error: 'Please provide a valid displayname.' });
         }
         document.querySelector('#needs-validation').classList.add('was-validated');
         if (this.state.error === '') {
