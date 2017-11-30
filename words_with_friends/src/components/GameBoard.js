@@ -36,6 +36,18 @@ export default class InGameView extends React.Component {
         console.log(this.state.letterBoard);
     }
 
+    shuffle(array) {
+        var m = array.length,
+            t, i;
+        while (m) {
+            i = Math.floor(Math.random() * m--);
+            t = array[m];
+            array[m] = array[i];
+            array[i] = t;
+        }
+        return array;
+    }
+
     render() {
         if (this.state.currentUser === null) {
             return <Redirect to={constants.routes.signin} />;
@@ -47,6 +59,17 @@ export default class InGameView extends React.Component {
             tiles.push(
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord}/>
             )
+        }
+
+        let shuffledTiles = shuffle(TILES);
+
+        randomLetters = [];
+        for(let i = 0; i < 7; i++) {
+        randomSelect = Math.floor(Math.random()*shuffledTiles.length)
+        let randomTile = shuffledTiles[randomSelect]
+        shuffledTiles.splice(randomSelect, 1);
+        randomLetters.push(<Tile key={i} messageSnapshot={randomTile} />))
+
         }
         return (
             <div className='container'>
