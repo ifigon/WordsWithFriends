@@ -1,9 +1,100 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  overflow-x: hidden;
+  background-color: #d5dfea;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0;
+  padding-left: .5em;
+}
+
+.background {
+  background: linear-gradient(#2878bc, #0d3c70);
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  color: #eeeff1; 
+}
+
+span {
+  color: #eeb63f;
+  text-decoration: none;
+}
+
+h1 {
+  text-shadow: 3px 3px #000000;
+  font-family: "Varela Round";
+  font-weight: 700;
 }
 
 .tile-button {
   height: 40px;
+}
+
+.banner {
+  background: linear-gradient(#2878bc, #2d69a8);
+  text-decoration: none;
+  color: #fff;
+  font-family: sans-serif;
+  margin: 0 -9999rem;
+  /* add back negative margin value */
+  padding: 1em 9999rem;
+}
+
+.user {
+  border: 1px;  
+  border-radius: 5px;
+  padding: 3px 10px;
+  background-color: #f4c439;
+  
+  text-decoration: none;
+	color: #4c1900;
+	font-size: 25px;
+	font-family: Helvetica;
+  font-weight: bold;
+}
+
+/* .glass can be used on each tile*/
+.glass {
+	/* background styles */
+	position: relative;
+	display: inline-block;
+	padding: 5px 15px;
+	background-color: #f4c439;
+
+	/* text styles */
+	text-decoration: none;
+	color: #4c1900;
+	font-size: 30px;
+	font-family: Helvetica;
+  font-weight: bold;
+  
+  border: 1px;
+  border-radius: 10px;
+  box-shadow: 0px 1px 4px -2px #333;
+}
+
+.glass:after {
+  content: '';
+  border-radius: 5px;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: calc(100% - 4px);
+	height: 50%;
+	background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+}
+ 
+.glass:hover {
+	background: linear-gradient(#f4c439,#f9e077);
+}
+
+.glass:focus {
+  background: linear-gradient(#f4c439,#f9e077);  
 }
