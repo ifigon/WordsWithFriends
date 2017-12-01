@@ -54,6 +54,9 @@ export default class InGameView extends React.Component {
     }
 
     render() {
+        let letterStyle= {
+            backgroundColor:"#F5F4F2"
+        }
 
         if (this.state.currentUser === null) {
             return <Redirect to={constants.routes.signin} />;
@@ -85,7 +88,7 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
 
-                <div className = "container d-flex flex-wrap" >
+                <div className = "container d-flex flex-wrap justify-content-center" style = {letterStyle}>
                     {randomLetters}
                 </div> 
 
