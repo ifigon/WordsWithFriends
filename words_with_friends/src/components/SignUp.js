@@ -37,7 +37,7 @@ export default class SignUpView extends React.Component {
             this.setState({ error: 'Password does not match. Please try again.' });
         }
         if (this.state.displayname === '') {
-            this.setState({error: 'Please provide a valid displayname.'});
+            this.setState({ error: 'Please provide a valid displayname.' });
         }
         document.querySelector('#needs-validation').classList.add('was-validated');
         if (this.state.error === '') {
@@ -63,49 +63,51 @@ export default class SignUpView extends React.Component {
             return <Redirect to={constants.routes.game} />;
         }
         return (
-            <div className='container'>
-                <h1>Sign Up</h1>
-                <div>
-                    {this.state.error ? <div className='alert alert-danger'>{this.state.error}</div> : undefined}
+            <div className='background'>
+                <div className='container'>
+                    <h1>Sign Up</h1>
+                    <div>
+                        {this.state.error ? <div className='alert alert-danger'>{this.state.error}</div> : undefined}
+                    </div>
+
+                    <form onSubmit={evt => this.handleSubmit(evt)} id='needs-validation' noValidate>
+                        <Input for='email'
+                            title='Email'
+                            id='email'
+                            type='email'
+                            placeholder='enter your email address'
+                            value={this.state.email}
+                            onInput={evt => this.setState({ email: evt.target.value })} />
+
+                        <Input for='password'
+                            title='Password'
+                            id='password'
+                            type='password'
+                            placeholder='enter your password'
+                            value={this.state.password}
+                            onInput={evt => this.setState({ password: evt.target.value })} />
+
+                        <Input for='confirm'
+                            title='Confirm Password'
+                            id='confirm'
+                            type='password'
+                            placeholder='re-enter your password'
+                            value={this.state.confirm}
+                            onInput={evt => this.setState({ confirm: evt.target.value })} />
+
+                        <Input for='displayname'
+                            title='Displayname'
+                            id='displayname'
+                            type='text'
+                            placeholder='enter your displayname'
+                            value={this.state.displayname}
+                            onInput={evt => this.setState({ displayname: evt.target.value })} />
+
+                        <button type='submit' className='btn btn-primary'>Sign Up</button>
+                    </form>
+
+                    <p>Already have an account? <Link to={constants.routes.signin}><span>Sign In Here</span></Link></p>
                 </div>
-
-                <form onSubmit={evt => this.handleSubmit(evt)} id='needs-validation' noValidate>
-                    <Input for='email'
-                        title='Email'
-                        id='email'
-                        type='email'
-                        placeholder='enter your email address'
-                        value={this.state.email}
-                        onInput={evt => this.setState({ email: evt.target.value })} />
-
-                    <Input for='password'
-                        title='Password'
-                        id='password'
-                        type='password'
-                        placeholder='enter your password'
-                        value={this.state.password}
-                        onInput={evt => this.setState({ password: evt.target.value })} />
-
-                    <Input for='confirm'
-                        title='Confirm Password'
-                        id='confirm'
-                        type='password'
-                        placeholder='re-enter your password'
-                        value={this.state.confirm}
-                        onInput={evt => this.setState({ confirm: evt.target.value })} />
-
-                    <Input for='displayname'
-                        title='Displayname'
-                        id='displayname'
-                        type='text'
-                        placeholder='enter your displayname'
-                        value={this.state.displayname}
-                        onInput={evt => this.setState({ displayname: evt.target.value })} />
-
-                    <button type='submit' className='btn btn-primary'>Sign Up</button>
-                </form>
-
-                <p>Already have an account? <Link to={constants.routes.signin}>Sign In Here</Link></p>
             </div>
         );
     }

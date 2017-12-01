@@ -3,23 +3,28 @@ import firebase from 'firebase/app';
 import { Redirect } from 'react-router-dom';
 import constants from './constants';
 
-export default class InGameView extends React.Component {
+export default class BoardTile extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            letter: "",
+            point: undefined
         }
     }
 
-    handleTilePlace() {
-        console.log(this.props.xCoord + " " + this.props.yCoord);
+    handleTilePlace(evt) {
+        evt.classList.add('glass');
+        this.setState({
+            letter: this.props.userLetter.letter, 
+            point: this.props.userLetter.point
+        });
         this.props.callBack(this.props.xCoord, this.props.yCoord);
     }
 
     render() {
         return (
             <div className="col-1 p-0 tile-button">
-                <button onClick={() => this.handleTilePlace()} className="w-100 h-100"></button>
+                <button onClick={(evt) => this.handleTilePlace(evt.currentTarget)} className="w-100 h-100" disabled={!this.props.userTileSelected}>{this.state.letter}<sup>{this.state.point}</sup></button>
             </div>
         )
     }

@@ -39,31 +39,33 @@ export default class SignInView extends React.Component {
             return <Redirect to={constants.routes.game} />;
         }
         return (
-            <div className='container'>
-                <h1>Sign In</h1>
-                <div>
-                    {this.state.error ? <div className='alert alert-danger'>{this.state.error}</div> : undefined}
+            <div className='background'>
+                <div className='container'>
+                    <h1>Sign In</h1>
+                    <div>
+                        {this.state.error ? <div className='alert alert-danger'>{this.state.error}</div> : undefined}
+                    </div>
+
+                    <form onSubmit={evt => this.handleSignIn(evt)}>
+                        <Input for='email'
+                            title='Email'
+                            id='email'
+                            type='email'
+                            value={this.state.email}
+                            onInput={evt => this.setState({ email: evt.target.value })} />
+
+                        <Input for='password'
+                            title='Password'
+                            id='password'
+                            type='password'
+                            value={this.state.password}
+                            onInput={evt => this.setState({ password: evt.target.value })} />
+
+                        <button type='submit' className='btn btn-primary'>Sign In</button>
+                    </form>
+
+                    <p>Don't yet have an account? <Link to={constants.routes.signup}><span>Sign Up!</span></Link></p>
                 </div>
-
-                <form onSubmit={evt => this.handleSignIn(evt)}>
-                    <Input for='email'
-                        title='Email'
-                        id='email'
-                        type='email'
-                        value={this.state.email}
-                        onInput={evt => this.setState({ email: evt.target.value })} />
-
-                    <Input for='password'
-                        title='Password'
-                        id='password'
-                        type='password'
-                        value={this.state.password}
-                        onInput={evt => this.setState({ password: evt.target.value })} />
-
-                    <button type='submit' className='btn btn-primary'>Sign In</button>
-                </form>
-
-                <p>Don't yet have an account? <Link to={constants.routes.signup}>Sign Up!</Link></p>
             </div>
         );
     }
