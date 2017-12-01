@@ -7,6 +7,10 @@ export default class Tile extends React.Component {
 
         };
     };
+    
+    handleTileSelect() {
+        this.props.callBack(this.props.randomTile);
+    }
 
     render() {
         let tileStyles = {
@@ -22,7 +26,7 @@ export default class Tile extends React.Component {
         let point = this.props.randomTile.point;
 
         return (
-            <button className="btn col-1" style= {tileStyles} >
+            <button onClick={() => this.handleTileSelect()} className="btn col-1" disabled={this.props.userTileSelected} style= {tileStyles} >
                 {letter} {point}
             </button>
         );

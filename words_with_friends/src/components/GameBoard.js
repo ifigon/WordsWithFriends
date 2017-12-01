@@ -8,7 +8,7 @@ import letterTiles from '../tiles';
 
 import BoardTile from "./BoardTile";
 
-import Tile from "./tile";
+import Tile from "./Tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -22,7 +22,9 @@ export default class InGameView extends React.Component {
             letterBoard.push(row);
         }
         this.state = {
+            userTileSelected: false,
             letterBoard: letterBoard,
+            userLetter: undefined,
             currentUser: firebase.auth().currentUser,
             error: ''
         };
@@ -34,9 +36,15 @@ export default class InGameView extends React.Component {
             .catch(err => this.setState({ error: err.message }));
     }
 
+    selectUserTile = (selectedLetter) => {
+        this.state.userTileSelected = true;
+        this.setState({userLetter : selectedLetter});
+    }
+
     updateBoard = (xCoord, yCoord) => {
+        this.state.userTileSelected = false;
         let newBoard = this.state.letterBoard;
-        newBoard[xCoord][yCoord] = "T";  // Just a testing letter, will add letter parameter to this method later 
+        newBoard[xCoord][yCoord] = this.state.userLetter.letter;  // Just a testing letter, will add letter parameter to this method later 
         this.setState({ letterBoard: newBoard });
         console.log(this.state.letterBoard);
     }
@@ -66,11 +74,10 @@ export default class InGameView extends React.Component {
             let xCoord = i % 12;
             let yCoord = Math.floor(i / 12);
             tiles.push(
-                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} />
+                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected}/>
             )
         }
 
-        
         let shuffledTiles = this.shuffle(letterTiles.tile);
         let randomLetters = [];       
         for (let i = 0; i < 7; i++) {
@@ -78,7 +85,7 @@ export default class InGameView extends React.Component {
             let randomTile = shuffledTiles[randomSelect]
            // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
             randomLetters.push(
-                <Tile key={i} randomTile={randomTile} />
+                <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected}/>
             )
         }
         return (

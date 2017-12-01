@@ -4,5 +4,4 @@ export default {
         signup: '/signup',
         game: '/game'
     }
-
 }
