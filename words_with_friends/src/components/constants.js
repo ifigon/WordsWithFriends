@@ -3,10 +3,6 @@ export default {
         signin: '/',
         signup: '/signup',
         game: '/game'
-    };
-
-    const TILES = [
-
-    ]
+    }
 
 }

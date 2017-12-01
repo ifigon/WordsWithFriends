@@ -1,6 +1,6 @@
-"use strict";
+export default{
 
-const TILES = [
+    tile : [
     {
         letter: "A",
         point: 1
@@ -233,4 +233,5 @@ const TILES = [
         letter: "Z",
         point: 10
     },
-];
+]
+}

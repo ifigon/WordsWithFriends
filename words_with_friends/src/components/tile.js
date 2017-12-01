@@ -14,9 +14,9 @@ export default class Tile extends React.Component {
         let point = this.props.randomTile.point;
 
         return (
-            <div className="btn">
+            <button className="btn btn-primary col-1">
                 {letter} {point}
-            </div>
+            </button>
         );
     }
 }

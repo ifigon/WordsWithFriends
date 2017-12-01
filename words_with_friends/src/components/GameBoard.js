@@ -4,10 +4,11 @@ import React from 'react';
 import firebase from 'firebase/app';
 import { Redirect } from 'react-router-dom';
 import constants from './constants';
+import letterTiles from '../tiles';
 
 import BoardTile from "./BoardTile";
 
-import Tile from "./Tile";
+import Tile from "./tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -66,13 +67,13 @@ export default class InGameView extends React.Component {
             )
         }
 
-        //Struggling with 
-        let shuffledTiles = this.shuffle(TILES);
-        let randomLetters = [];
+        
+        let shuffledTiles = this.shuffle(letterTiles.tile);
+        let randomLetters = [];       
         for (let i = 0; i < 7; i++) {
             let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
             let randomTile = shuffledTiles[randomSelect]
-            shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+           // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
             randomLetters.push(
                 <Tile key={i} randomTile={randomTile} />
             )
@@ -83,6 +84,11 @@ export default class InGameView extends React.Component {
                 <div className="container d-flex flex-wrap">
                     {tiles}
                 </div>
+
+                <div className = "container d-flex flex-wrap" >
+                    {randomLetters}
+                </div> 
+
                 <button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>Sign Out</button>
             </div>
         );
