@@ -13,6 +13,9 @@ p, h1, h2, h3, h4, h5, h6 {
   padding-left: .5em;
 }
 
+/**
+ * Sets up the full screen background for the signin/signup
+ */
 .background {
   background: linear-gradient(#2878bc, #0d3c70);
   height: 100vh;
@@ -22,11 +25,17 @@ p, h1, h2, h3, h4, h5, h6 {
   color: #eeeff1; 
 }
 
+/**
+ * Styles the Link in signin/signup
+ */
 span {
   color: #eeb63f;
   text-decoration: none;
 }
 
+/**
+ * Font type for Words With Friendz
+ */
 h1 {
   text-shadow: 3px 3px #000000;
   font-family: "Varela Round";
@@ -37,6 +46,9 @@ h1 {
   height: 40px;
 }
 
+/**
+ * Style for banner on the header/footer
+ */
 .banner {
   background: linear-gradient(#2878bc, #2d69a8);
   text-decoration: none;
@@ -47,6 +59,9 @@ h1 {
   padding: 1em 9999rem;
 }
 
+/**
+ * Style for the user scoreboard tile
+ */
 .user {
   border: 1px;  
   border-radius: 5px;
@@ -60,7 +75,9 @@ h1 {
   font-weight: bold;
 }
 
-/* .glass can be used on each tile*/
+/** 
+ * Style used on each individual tile
+ */
 .glass {
 	/* background styles */
 	position: relative;

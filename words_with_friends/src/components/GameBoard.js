@@ -64,13 +64,17 @@ export default class InGameView extends React.Component {
     }
 
     render() {
-        // let letterStyle = {
-        //     backgroundColor: "#F5F4F2"
-        // }
-
+        /** 
+         * Reditects the page if user is not signed in 
+         */
         if (this.state.currentUser === null) {
             return <Redirect to={constants.routes.signin} />;
         }
+
+        /** 
+         * Sets up the tiles on the game board
+         * Updates to a new board when user places a letter
+         */
         let tiles = [];
         for (let i = 0; i < 144; i++) {
             let xCoord = i % 12;
@@ -80,6 +84,10 @@ export default class InGameView extends React.Component {
             )
         }
         
+        /**
+         * Shuffles the array of tile objects and randomly selects 7
+         * Pushes the 7 tiles to randomLetters array
+         */
         let shuffledTiles = this.shuffle(letterTiles.tile);
         let randomLetters = [];
         for (let i = 0; i < 7; i++) {
@@ -90,15 +98,20 @@ export default class InGameView extends React.Component {
                 <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
             )
         }
+
+        /**
+         * Gets the initials of the current user to be displayed in the scoreboard
+         */
+        let userInitial = this.state.currentUser.displayName.charAt(0);
+
         return (
             <div className='container'>
                 <div className='row justify-content-between banner'>
                     <h1>Words With Friendz</h1>
-                    {/* placeholder usernames*/}
                     <div className='d-flex'>
-                        <div className='user'>W</div>
+                        <div className='user'>{userInitial}</div>
                         <div>
-                            <p>wynhsu</p>
+                            <p>{this.state.currentUser.displayName}</p>
                             <h5>343</h5>
                         </div>
                     </div>

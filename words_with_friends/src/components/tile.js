@@ -13,15 +13,6 @@ export default class Tile extends React.Component {
     }
 
     render() {
-        // let tileStyles = {
-        //     backgroundColor: "#D8B997",
-        //     color: "#403E3E",
-        //    // fontSize: "200%",
-        //     margin: "5px",
-        //     borderRadius: "3px",
-        //     fontWeight: "bold"
-        // }
-
         let letter = this.props.randomTile.letter;
         let point = this.props.randomTile.point;
 
