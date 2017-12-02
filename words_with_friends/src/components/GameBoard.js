@@ -46,9 +46,63 @@ export default class InGameView extends React.Component {
         this.state.userTileSelected = false;
         let newBoard = this.state.letterBoard;
         newBoard[xCoord][yCoord] = this.state.userLetter.letter;  // Just a testing letter, will add letter parameter to this method later
-        console.log(newBoard[xCoord][yCoord]);
         this.setState({ letterBoard: newBoard });
-        console.log(this.state.letterBoard);
+        let counter = xCoord;
+        while(newBoard[counter][yCoord] !== "-" && counter >= 0) {
+        counter--;
+        }
+        counter++;
+        let xWord = "";
+        while(newBoard[counter][yCoord] !== "-" && counter <= 11) {
+        xWord += newBoard[counter][yCoord];
+        counter++;
+        }
+        counter = yCoord;
+        while(newBoard[xCoord][counter] !== "-" && counter >= 0) {
+        counter--;
+        }
+        counter++;
+        let yWord = "";
+        while(newBoard[xCoord][counter] !== "-" && counter <= 11) {
+        yWord += newBoard[xCoord][counter];
+        counter++;
+        }
+        console.log(xWord);
+        console.log(yWord);
+
+        var request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/swimming", {
+            headers: new Headers({
+                "Accept": "application/json",
+                "app_id": "b93dccf8",
+                "app_key": "a21b1a8694543b981621557669e50641"
+            })
+        });
+        
+        /* fetch(request)
+            .then(this.handleResponse)
+            .then(this.updateScore)
+            .catch(this.handleError);
+        */
+    }
+
+    handleError(err) {
+        console.error(err);
+        alert(err);
+        //errorAlert.classList.remove("d-none");
+    }
+
+    handleResponse(response) {
+        if(response.ok) {
+            return response.json();
+        } else {
+            return response.text().then(function(message) {
+                throw new Error(message);
+            });
+        }
+    }
+
+    updateScore(data) {
+        console.log(data);
     }
 
     shuffle(array) {
