@@ -64,8 +64,8 @@ export default class SignUpView extends React.Component {
         }
         return (
             <div className='background'>
-                <div className='container'>
-                    <h1>Sign Up</h1>
+                <div className='container p-5'>
+                    <h1 className='pb-3'>Sign Up</h1>
                     <div>
                         {this.state.error ? <div className='alert alert-danger'>{this.state.error}</div> : undefined}
                     </div>
@@ -106,7 +106,7 @@ export default class SignUpView extends React.Component {
                         <button type='submit' className='btn btn-primary'>Sign Up</button>
                     </form>
 
-                    <p>Already have an account? <Link to={constants.routes.signin}><span>Sign In Here</span></Link></p>
+                    <p className="pt-2">Already have an account? <Link to={constants.routes.signin}><span>Sign In Here</span></Link></p>
                 </div>
             </div>
         );

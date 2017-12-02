@@ -10,6 +10,8 @@ import BoardTile from "./BoardTile";
 
 import Tile from "./tile";
 
+const OXFORD_API_URL = "https://od-api.oxforddictionaries.com/api/v1"
+
 export default class InGameView extends React.Component {
     constructor(props) {
         super(props);
