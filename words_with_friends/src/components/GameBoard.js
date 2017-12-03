@@ -8,12 +8,16 @@ import letterTiles from '../tiles';
 
 import BoardTile from "./BoardTile";
 
-import Tile from "./tile";
+import Tile from "./Tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
         super(props);
         let letterBoard = [];
+        /** 
+         * Initializes the game board to be completely empty. "-" means there
+         * is no letter currently on that tile
+         */
         for (let i = 0; i < 12; i++) {
             let row = [];
             for (let j = 0; j < 12; j++) {
@@ -30,23 +34,44 @@ export default class InGameView extends React.Component {
         };
     }
 
+    /** 
+     * Signs user out
+     */
     handleSignOut() {
         firebase.auth().signOut()
             .then(() => this.props.history.push(constants.routes.signin))
             .catch(err => this.setState({ error: err.message }));
     }
 
+    /** 
+     * When a user picks a tile that they want to put down from the user tiles,
+     * updates the game state to reflect which tile they chose
+     */
     selectUserTile = (selectedLetter) => {
-        console.log(selectedLetter);
-        this.state.userTileSelected = true;
+        this.setState({ userTileSelected : true});
         this.setState({ userLetter: selectedLetter });
     }
 
+    /** 
+     * Updates the board when a user places a tile on the board and determines
+     * whether the user has placed a valid word
+     */
     updateBoard = (xCoord, yCoord) => {
-        this.state.userTileSelected = false;
+        /** 
+         * Updates the state of the board after user places a tile
+         */
+        this.setState({ userTileSelected : false});
         let newBoard = this.state.letterBoard;
-        newBoard[xCoord][yCoord] = this.state.userLetter.letter;  // Just a testing letter, will add letter parameter to this method later
+        newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         this.setState({ letterBoard: newBoard });
+
+        /** 
+         * Used for building words based on where the user place their tile
+         * Cycles back 1 index at a time until it finds the beginning of the word, then
+         * cycles forward to build up the a word one letter at a time. Does this vertically
+         * and horizontally to build up the horizontal possible word (xWord) and vertical
+         * possible word (yWord)
+         */
         let counter = xCoord;
         while(newBoard[counter][yCoord] !== "-" && counter >= 0) {
         counter--;
@@ -70,6 +95,9 @@ export default class InGameView extends React.Component {
         console.log(xWord);
         console.log(yWord);
 
+        /** 
+         * Creates the request used for the Oxford API call
+         */
         var request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/swimming", {
             headers: new Headers({
                 "Accept": "application/json",
@@ -77,7 +105,11 @@ export default class InGameView extends React.Component {
                 "app_key": "a21b1a8694543b981621557669e50641"
             })
         });
-        
+
+        /** 
+         * Calls on Oxford dictionary API to determine whether the user
+         * has placed a valid word
+         */
         /* fetch(request)
             .then(this.handleResponse)
             .then(this.updateScore)
@@ -85,12 +117,18 @@ export default class InGameView extends React.Component {
         */
     }
 
+    /** 
+     * Used in AJAX call to handle error
+     */
     handleError(err) {
         console.error(err);
         alert(err);
         //errorAlert.classList.remove("d-none");
     }
 
+    /** 
+     * Used in AJAX call to handle response
+     */
     handleResponse(response) {
         if(response.ok) {
             return response.json();
@@ -101,10 +139,17 @@ export default class InGameView extends React.Component {
         }
     }
 
+    /** 
+     * Used to update the user score after determining whether the user
+     * placed a valid word
+     */
     updateScore(data) {
         console.log(data);
     }
 
+    /** 
+     * Shuffles the given array, used when picking user tiles
+     */
     shuffle(array) {
         var m = array.length,
             t, i;
@@ -116,7 +161,7 @@ export default class InGameView extends React.Component {
         }
         return array;
     }
-
+  
     render() {
         /** 
          * Reditects the page if user is not signed in 
