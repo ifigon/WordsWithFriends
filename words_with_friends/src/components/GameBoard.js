@@ -8,7 +8,7 @@ import letterTiles from '../tiles';
 
 import BoardTile from "./BoardTile";
 
-import Tile from "./tile";
+import Tile from "./Tile";
 
 const OXFORD_API_URL = "https://od-api.oxforddictionaries.com/api/v1"
 
@@ -16,6 +16,10 @@ export default class InGameView extends React.Component {
     constructor(props) {
         super(props);
         let letterBoard = [];
+        /** 
+         * Initializes the game board to be completely empty. "-" means there
+         * is no letter currently on that tile
+         */
         for (let i = 0; i < 12; i++) {
             let row = [];
             for (let j = 0; j < 12; j++) {
@@ -32,27 +36,122 @@ export default class InGameView extends React.Component {
         };
     }
 
+    /** 
+     * Signs user out
+     */
     handleSignOut() {
         firebase.auth().signOut()
             .then(() => this.props.history.push(constants.routes.signin))
             .catch(err => this.setState({ error: err.message }));
     }
 
+    /** 
+     * When a user picks a tile that they want to put down from the user tiles,
+     * updates the game state to reflect which tile they chose
+     */
     selectUserTile = (selectedLetter) => {
-        console.log(selectedLetter);
-        this.state.userTileSelected = true;
+        this.setState({ userTileSelected : true});
         this.setState({ userLetter: selectedLetter });
     }
 
+    /** 
+     * Updates the board when a user places a tile on the board and determines
+     * whether the user has placed a valid word
+     */
     updateBoard = (xCoord, yCoord) => {
-        this.state.userTileSelected = false;
+        /** 
+         * Updates the state of the board after user places a tile
+         */
+        this.setState({ userTileSelected : false});
         let newBoard = this.state.letterBoard;
-        newBoard[xCoord][yCoord] = this.state.userLetter.letter;  // Just a testing letter, will add letter parameter to this method later
-        console.log(newBoard[xCoord][yCoord]);
+        newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         this.setState({ letterBoard: newBoard });
-        console.log(this.state.letterBoard);
+
+        /** 
+         * Used for building words based on where the user place their tile
+         * Cycles back 1 index at a time until it finds the beginning of the word, then
+         * cycles forward to build up the a word one letter at a time. Does this vertically
+         * and horizontally to build up the horizontal possible word (xWord) and vertical
+         * possible word (yWord)
+         */
+        let counter = xCoord;
+        while(newBoard[counter][yCoord] !== "-" && counter >= 0) {
+        counter--;
+        }
+        counter++;
+        let xWord = "";
+        while(newBoard[counter][yCoord] !== "-" && counter <= 11) {
+        xWord += newBoard[counter][yCoord];
+        counter++;
+        }
+        counter = yCoord;
+        while(newBoard[xCoord][counter] !== "-" && counter >= 0) {
+        counter--;
+        }
+        counter++;
+        let yWord = "";
+        while(newBoard[xCoord][counter] !== "-" && counter <= 11) {
+        yWord += newBoard[xCoord][counter];
+        counter++;
+        }
+        console.log(xWord);
+        console.log(yWord);
+
+        /** 
+         * Creates the request used for the Oxford API call
+         */
+        var request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/swimming", {
+            headers: new Headers({
+                "Accept": "application/json",
+                "app_id": "b93dccf8",
+                "app_key": "a21b1a8694543b981621557669e50641"
+            })
+        });
+
+        /** 
+         * Calls on Oxford dictionary API to determine whether the user
+         * has placed a valid word
+         */
+        /* fetch(request)
+            .then(this.handleResponse)
+            .then(this.updateScore)
+            .catch(this.handleError);
+        */
     }
 
+    /** 
+     * Used in AJAX call to handle error
+     */
+    handleError(err) {
+        console.error(err);
+        alert(err);
+        //errorAlert.classList.remove("d-none");
+    }
+
+    /** 
+     * Used in AJAX call to handle response
+     */
+    handleResponse(response) {
+        if(response.ok) {
+            return response.json();
+        } else {
+            return response.text().then(function(message) {
+                throw new Error(message);
+            });
+        }
+    }
+
+    /** 
+     * Used to update the user score after determining whether the user
+     * placed a valid word
+     */
+    updateScore(data) {
+        console.log(data);
+    }
+
+    /** 
+     * Shuffles the given array, used when picking user tiles
+     */
     shuffle(array) {
         var m = array.length,
             t, i;
@@ -64,15 +163,19 @@ export default class InGameView extends React.Component {
         }
         return array;
     }
-
+  
     render() {
-        // let letterStyle = {
-        //     backgroundColor: "#F5F4F2"
-        // }
-
+        /** 
+         * Reditects the page if user is not signed in 
+         */
         if (this.state.currentUser === null) {
             return <Redirect to={constants.routes.signin} />;
         }
+
+        /** 
+         * Sets up the tiles on the game board
+         * Updates to a new board when user places a letter
+         */
         let tiles = [];
         for (let i = 0; i < 144; i++) {
             let xCoord = i % 12;
@@ -82,6 +185,10 @@ export default class InGameView extends React.Component {
             )
         }
         
+        /**
+         * Shuffles the array of tile objects and randomly selects 7
+         * Pushes the 7 tiles to randomLetters array
+         */
         let shuffledTiles = this.shuffle(letterTiles.tile);
         let randomLetters = [];
         for (let i = 0; i < 7; i++) {
@@ -92,15 +199,20 @@ export default class InGameView extends React.Component {
                 <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
             )
         }
+
+        /**
+         * Gets the initials of the current user to be displayed in the scoreboard
+         */
+        let userInitial = this.state.currentUser.displayName.charAt(0);
+
         return (
             <div className='container'>
                 <div className='row justify-content-between banner'>
                     <h1>Words With Friendz</h1>
-                    {/* placeholder usernames*/}
                     <div className='d-flex'>
-                        <div className='user'>W</div>
+                        <div className='user'>{userInitial}</div>
                         <div>
-                            <p>wynhsu</p>
+                            <p>{this.state.currentUser.displayName}</p>
                             <h5>343</h5>
                         </div>
                     </div>
