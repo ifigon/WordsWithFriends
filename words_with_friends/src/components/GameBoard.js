@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
