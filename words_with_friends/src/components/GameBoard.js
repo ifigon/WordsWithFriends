@@ -36,6 +36,7 @@ export default class InGameView extends React.Component {
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
+            tilesLeft: letterTiles.tile.length, //Need to update tiles left
         };
     }
 
@@ -290,7 +291,7 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
-                         <p>  Tiles left </p>
+                         <p> {this.state.tilesLeft} Tiles left </p>
                      {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
