@@ -1,21 +1,22 @@
-//How do i get access to a constant
-
 import React from 'react';
 import firebase from 'firebase/app';
 import { Redirect } from 'react-router-dom';
 import constants from './constants';
 import letterTiles from '../tiles';
+import tileValues from '../tilevalues';
+
 import BoardTile from "./BoardTile";
 import Tile from "./Tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
         super(props);
-        let letterBoard = [];
+
         /** 
          * Initializes the game board to be completely empty. "-" means there
          * is no letter currently on that tile
          */
+        let letterBoard = [];        
         for (let i = 0; i < 12; i++) {
             let row = [];
             for (let j = 0; j < 12; j++) {
@@ -23,14 +24,16 @@ export default class InGameView extends React.Component {
             }
             letterBoard.push(row);
         }
+
         this.state = {
+            placeTileMode: true,
             userTileSelected: false,
             letterBoard: letterBoard,
             userLetter: undefined,
-            xWord: '',
-            yWord: '',
+            usedWords: [],
+            score1 : 0,
+            score2: 0,
             currentUser: firebase.auth().currentUser,
-            error: ''
         };
     }
 
@@ -60,82 +63,74 @@ export default class InGameView extends React.Component {
         /** 
          * Updates the state of the board after user places a tile
          */
-        this.setState({ userTileSelected : false});
+        this.state.placeTileMode ? this.setState({ userTileSelected : false}) : undefined;
         let newBoard = this.state.letterBoard;
-        newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
+        if(this.state.placeTileMode) {
+            newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
+        } else {
+            newBoard[xCoord][yCoord] = "-"; 
+        }
         this.setState({ letterBoard: newBoard });
-
-        /** 
-         * Used for building words based on where the user place their tile
-         * Cycles back 1 index at a time until it finds the beginning of the word, then
-         * cycles forward to build up the a word one letter at a time. Does this vertically
-         * and horizontally to build up the horizontal possible word (xWord) and vertical
-         * possible word (yWord)
-         */
-        let counter = xCoord;
-        while(newBoard[counter][yCoord] !== "-" && counter >= 0) {
-        counter--;
-        }
-        counter++;
-        let xWord = "";
-        while(newBoard[counter][yCoord] !== "-" && counter <= 11) {
-        xWord += newBoard[counter][yCoord];
-        counter++;
-        }
-        counter = yCoord;
-        while(newBoard[xCoord][counter] !== "-" && counter >= 0) {
-        counter--;
-        }
-        counter++;
-        let yWord = "";
-        while(newBoard[xCoord][counter] !== "-" && counter <= 11) {
-        yWord += newBoard[xCoord][counter];
-        counter++;
-        }
-        console.log(xWord);
-        console.log(yWord);
-
-        if (xWord.length >= 2) {
-            this.setState({xWord: xWord.toLowerCase()});
-        }
-        if (yWord.length >= 2) {
-            this.setState({yWord: yWord.toLowerCase()});
-        }
-
-        /** 
-         * Creates the request used for the Oxford API call
-         */
-        var request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/swimming", {
-            headers: new Headers({
-                "Accept": "application/json",
-                "app_id": "b93dccf8",
-                "app_key": "a21b1a8694543b981621557669e50641"
-            })
-        });
-
-        /** 
-         * Calls on Oxford dictionary API to determine whether the user
-         * has placed a valid word
-         */
-        /* fetch(request)
-            .then(this.handleResponse)
-            .then(this.updateScore)
-            .catch(this.handleError);
-        */
-
-
     }
 
-    /**
-     * START OF WYNSTON'S TESTS: IN PROGRESS
+    /** 
+     * Called when the user submits a word, checks every single tile looking for new words.
+     * If it finds a new word, checks if that word is in the dictionary, and if it is it 
+     * updates the score accordingly
      */
     checkWord() {
-        console.log('word in state ' + this.state.xWord);
-        console.log('word in state ' + this.state.yWord);
-        this.fetchWord(this.state.xWord);
-        this.fetchWord(this.state.yWord);
+        /** 
+         * Goes left to right through each coordinate one by one, for example starts at 0,0
+         * then 1,0 then 2,0 etc. As soon as it hits a character on the board that's not a dash
+         * it begins to build up a new word letter by letter. Once it hits another dash or the end
+         * of the board, it checks if the word it has built up is greater than length 1 and that
+         * it hasn't been placed down for points already. If both of these conditions are true,
+         * checks if it's a valid word using the Dictionary API.
+         */
+        for(let yCoord = 0; yCoord < 12; yCoord++) {
+            let possibleWord = "";
+            for(let xCoord = 0; xCoord < 12; xCoord++) {
+                let letter = this.state.letterBoard[xCoord][yCoord];
+                if(letter !== "-") {
+                    possibleWord += letter;
+                } 
+                if(letter === "-" || xCoord == 11) {
+                    if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
+                        console.log(possibleWord);
+                        this.state.usedWords.push(possibleWord);
+                        this.fetchWord(possibleWord);
+                    }
+                    possibleWord = "";
+                }
+            }
+        }
+
+        /** 
+         * Same algorithm as above only this time it looks for vertical words not horizontal words. So
+         * it starts at coordinate 0,0 then 0,1 then 0,2 etc.
+         */
+        for(let xCoord = 0; xCoord < 12; xCoord++) {
+            let possibleWord = "";
+            for(let yCoord = 0; yCoord < 12; yCoord++) {
+                let letter = this.state.letterBoard[xCoord][yCoord];
+                if(letter !== "-") {
+                    possibleWord += letter;
+                } 
+                if(letter === "-" || yCoord == 11) {
+                    if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
+                        console.log(possibleWord);
+                        this.state.usedWords.push(possibleWord);
+                        this.fetchWord(possibleWord);
+                    }
+                    possibleWord = "";
+                }
+            }
+        }
     }
 
+    /** 
+     * Uses the dictionary api to check if the passed in word is valid
+     */
     fetchWord(word) {
         const API_KEY = '?key=92de68e0-2615-460b-9152-16088d0944b7';
         const QUERY = 'https://www.dictionaryapi.com/api/v1/references/collegiate/xml/';
@@ -143,50 +138,38 @@ export default class InGameView extends React.Component {
             .then(response => response.text())
             .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
             .then(this.handleXML)
+            .then(this.updateScore)
             .catch(this.handleError);
     }
 
+    /** 
+     * Uses the dictionary api to check if the passed in word is valid
+     */
     handleXML(data) {
         console.log(data);
-        if (data
-            && data.getElementsByTagName('ew')[0] !== undefined) {
+        if (data && data.getElementsByTagName('ew')[0] !== undefined) {
             let word = data.getElementsByTagName('ew')[0].childNodes[0].nodeValue;
             console.log('word in dictionary ' + word);
-            return true; //word exists in dictionary
-        }
-    }
-    /**
-     * END OF WYNSTON'S TESTS: IN PROGRESS
-     */
-
-    /** 
-     * Used in AJAX call to handle error
-     */
-    handleError(err) {
-        console.error(err);
-        alert(err);
-        //errorAlert.classList.remove("d-none");
-    }
-
-    /** 
-     * Used in AJAX call to handle response
-     */
-    handleResponse(response) {
-        if(response.ok) {
-            return response.json();
+            return word;
         } else {
-            return response.text().then(function(message) {
-                throw new Error(message);
-            });
+            return "";
         }
     }
 
     /** 
-     * Used to update the user score after determining whether the user
-     * placed a valid word
+     * When the user submits a valid word checked by the dictionary api, it adds
+     * up the word score and updates the user score accordingly
      */
-    updateScore(data) {
-        console.log(data);
+    updateScore = (word) => {
+        console.log(word);
+        let wordScore = 0;
+        for(let i = 0; i < word.length; i++) {
+            let character = word.charAt(i);
+            let characterValue = tileValues.tileValues[character];
+            wordScore += characterValue;
+        }
+        let newScore = this.state.score1 + wordScore;
+        this.setState({ score1 : newScore});
     }
 
     /** 
@@ -221,7 +204,7 @@ export default class InGameView extends React.Component {
             let xCoord = i % 12;
             let yCoord = Math.floor(i / 12);
             tiles.push(
-                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} />
+                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} />
             )
         }
         
@@ -253,14 +236,14 @@ export default class InGameView extends React.Component {
                         <div className='user'>{userInitial}</div>
                         <div>
                             <p>{this.state.currentUser.displayName}</p>
-                            <h5>343</h5>
+                            <h5 id="score1">{this.state.score1}</h5>
                         </div>
                     </div>
                     <div className='d-flex'>
-                        <div className='user'>L</div>
+                        <div className='user'>C</div>
                         <div>
                             <p>CPU</p>
-                            <h5>0</h5>
+                            <h5 id="score2">{this.state.score2}</h5>
                         </div>
                     </div>
                     <div><button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>Sign Out</button></div>
@@ -272,7 +255,17 @@ export default class InGameView extends React.Component {
                     {randomLetters}
                 </div>
                 <div className='row justify-content-center banner'>
-                    <button onClick={() => this.checkWord()} className='btn btn-success'>Play</button>
+                    <div className="mr-5">
+                        <button onClick={() => this.checkWord()} className='btn btn-success'>Play Word</button>
+                    </div>
+                    <div className="ml-5 d-flex">
+                        <div className="mr-2">
+                            <button onClick={() => this.setState({ placeTileMode : true, userTileSelected: false })} disabled={this.state.placeTileMode} className='btn btn-primary'>Place Tile Mode</button>
+                        </div>
+                        <div className="ml-2">
+                            <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
