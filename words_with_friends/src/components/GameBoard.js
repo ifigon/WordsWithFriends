@@ -122,8 +122,6 @@ export default class InGameView extends React.Component {
             .then(this.updateScore)
             .catch(this.handleError);
         */
-
-
     }
 
     /**
