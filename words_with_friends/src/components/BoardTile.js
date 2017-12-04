@@ -13,12 +13,21 @@ export default class BoardTile extends React.Component {
     }
 
     handleTilePlace(evt) {
-        evt.classList.add('glass');
-        this.setState({
-            letter: this.props.userLetter.letter, 
-            point: this.props.userLetter.point
-        });
-        this.props.callBack(this.props.xCoord, this.props.yCoord);
+        if(this.props.placeTileMode) {
+            evt.classList.add('glass');
+            this.setState({
+                letter: this.props.userLetter.letter, 
+                point: this.props.userLetter.point
+            });
+            this.props.callBack(this.props.xCoord, this.props.yCoord);
+        } else {
+            evt.classList.remove('glass');
+            this.setState({
+                letter: "",
+                point: undefined
+            });
+            this.props.callBack(this.props.xCoord, this.props.yCoord);
+        }
     }
 
     render() {
