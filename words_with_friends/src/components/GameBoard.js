@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -28,13 +28,15 @@ export default class InGameView extends React.Component {
         this.state = {
             placeTileMode: true,
             userTileSelected: false,
-            letterBoard: letterBoard,
             userLetter: undefined,
+            letterBoard: letterBoard,
             usedWords: [],
+            randomLetters: [],
+            tilesPlacedThisTurn: [],
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
-            randomLetters: []
+            tilesLeft: letterTiles.tile.length, //Need to update tiles left
         };
     }
 
@@ -72,8 +74,10 @@ export default class InGameView extends React.Component {
      * updates the game state to reflect which tile they chose
      */
     selectUserTile = (selectedLetter) => {
-        this.setState({ userTileSelected : true});
-        this.setState({ userLetter: selectedLetter });
+        this.setState({ 
+            userTileSelected : true,
+            userLetter: selectedLetter
+        });
     }
 
     /** 
@@ -87,9 +91,20 @@ export default class InGameView extends React.Component {
         this.state.placeTileMode ? this.setState({ userTileSelected : false}) : undefined;
         let newBoard = this.state.letterBoard;
         if(this.state.placeTileMode) {
+            for(let i = 0; i < this.state.randomLetters.length; i++) {
+                let tileFound = false;
+                if(this.state.randomLetters[i].key === this.state.userLetter.key && !tileFound) {
+                    this.state.tilesPlacedThisTurn.push(this.state.randomLetters[i]);
+                    let newUserTiles = this.state.randomLetters.slice(0);
+                    newUserTiles.splice(i, 1);
+                    this.setState({ randomLetters : newUserTiles });
+                    tileFound = true;
+                }
+            }
             newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         } else {
             newBoard[xCoord][yCoord] = "-"; 
+            // Need to do more work on removing tiles and placing back into inventory
         }
         this.setState({ letterBoard: newBoard });
     }
@@ -230,20 +245,6 @@ export default class InGameView extends React.Component {
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} />
             )
         }
-        
-        /**
-         * Shuffles the array of tile objects and randomly selects 7
-         * Pushes the 7 tiles to randomLetters array
-         */
-        // let shuffledTiles = this.shuffle(letterTiles.tile);
-        // let randomTiles = [];
-        // for (let i = 0; i < 7; i++) {
-        //     let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-        //     let randomTile = shuffledTiles[randomSelect]
-        //     randomTiles.push(
-        //         <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
-        //     )
-        // }
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
@@ -289,6 +290,8 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
+                         <p> {this.state.tilesLeft} Tiles left </p>
+                     {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>
