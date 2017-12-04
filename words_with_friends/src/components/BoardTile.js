@@ -1,7 +1,4 @@
 import React from 'react';
-import firebase from 'firebase/app';
-import { Redirect } from 'react-router-dom';
-import constants from './constants';
 
 export default class BoardTile extends React.Component {
     constructor(props) {

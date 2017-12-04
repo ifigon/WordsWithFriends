@@ -31,7 +31,7 @@ export default class InGameView extends React.Component {
             userLetter: undefined,
             letterBoard: letterBoard,
             usedWords: [],
-            user1Tiles: [],
+            randomLetters: [],
             tilesPlacedThisTurn: [],
             score1 : 0,
             score2: 0,
@@ -41,27 +41,23 @@ export default class InGameView extends React.Component {
     }
 
     componentDidMount() {
-     /**
-         * Shuffles the array of tile objects and randomly selects 7
-         * Pushes the 7 tiles to randomLetters array
-         * also removes the selected tile from the original Tile array
-         * added unique to each tile to know which to remove when letter is used
-         */
+        this.renderShuffled();
+    }
+    
+    /**
+     * 
+     */
+    renderShuffled() {
         let shuffledTiles = this.shuffle(letterTiles.tile);
-        //console.log("shuffled Tile", shuffledTiles.length)
-        let randomLetters = [];
-        for (let i = randomLetters.length; i < 7; i++) {
+        let randomTiles = [];
+        for (let i = 0; i < 7; i++) {
             let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-           // console.log(randomSelect)
             let randomTile = shuffledTiles[randomSelect]
-            shuffledTiles.splice(randomSelect, 1);
-           //console.log("shuffled Tile is now", shuffledTiles.length)
-           //console.log(randomTile.key)
-            randomLetters.push(
-                <Tile key={randomTile.key} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+            randomTiles.push(
+                randomTile
             )
         }
-        this.setState({ user1Tiles: randomLetters });
+        this.setState({randomLetters: randomTiles});
     }
 
     /** 
@@ -95,13 +91,13 @@ export default class InGameView extends React.Component {
         this.state.placeTileMode ? this.setState({ userTileSelected : false}) : undefined;
         let newBoard = this.state.letterBoard;
         if(this.state.placeTileMode) {
-            for(let i = 0; i < this.state.user1Tiles.length; i++) {
+            for(let i = 0; i < this.state.randomLetters.length; i++) {
                 let tileFound = false;
-                if(this.state.user1Tiles[i].props.randomTile.key === this.state.userLetter.key && !tileFound) {
-                    this.state.tilesPlacedThisTurn.push(this.state.user1Tiles[i].props.randomTile);
-                    let newUserTiles = this.state.user1Tiles.slice(0);
+                if(this.state.randomLetters[i].key === this.state.userLetter.key && !tileFound) {
+                    this.state.tilesPlacedThisTurn.push(this.state.randomLetters[i]);
+                    let newUserTiles = this.state.randomLetters.slice(0);
                     newUserTiles.splice(i, 1);
-                    this.setState({ user1Tiles : newUserTiles });
+                    this.setState({ randomLetters : newUserTiles });
                     tileFound = true;
                 }
             }
@@ -134,7 +130,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || xCoord == 11) {
+                if(letter === "-" || xCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
@@ -156,7 +152,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || yCoord == 11) {
+                if(letter === "-" || yCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
@@ -166,6 +162,8 @@ export default class InGameView extends React.Component {
                 }
             }
         }
+
+        this.renderShuffled();
     }
 
     /** 
@@ -247,7 +245,6 @@ export default class InGameView extends React.Component {
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} />
             )
         }
-        
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
@@ -260,14 +257,14 @@ export default class InGameView extends React.Component {
                     <h1>Words With Friendz</h1>
                     <div className='d-flex'>
                         <div className='user'>{userInitial}</div>
-                        <div>
+                        <div id='1' className='yellow-text'>
                             <p>{this.state.currentUser.displayName}</p>
                             <h5 id="score1">{this.state.score1}</h5>
                         </div>
                     </div>
                     <div className='d-flex'>
                         <div className='user'>C</div>
-                        <div>
+                        <div id='2'>
                             <p>CPU</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
@@ -278,7 +275,9 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {this.state.user1Tiles} 
+                    {this.state.randomLetters.map((random, i) => 
+                        <Tile key={i} callBack={this.selectUserTile} randomTile={random} userTileSelected={this.state.userTileSelected} />
+                    )}
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">

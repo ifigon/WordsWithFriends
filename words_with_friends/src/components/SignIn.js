@@ -64,7 +64,7 @@ export default class SignInView extends React.Component {
                         <button type='submit' className='btn btn-primary'>Sign In</button>
                     </form>
 
-                    <p className='pt-2'>Don't yet have an account? <Link to={constants.routes.signup}><span>Sign Up!</span></Link></p>
+                    <p className='pt-2'>Don't yet have an account? <Link to={constants.routes.signup}><span className='yellow-text'>Sign Up!</span></Link></p>
                 </div>
             </div>
         );
