@@ -57,6 +57,28 @@ export default class InGameView extends React.Component {
         this.setState({ user1Tiles: randomLetters });
     }
 
+    addNewTilesToInventory = validTurn => {
+        console.log(validTurn);
+        if(validTurn) {
+            let shuffledTiles = this.shuffle(letterTiles.tile);
+            let randomLetters = [];
+            for (let i = this.state.user1Tiles.length; i < 7; i++) {
+                let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+                let randomTile = shuffledTiles[randomSelect]
+                // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+                randomLetters.push(
+                    <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                )
+            }
+            let currentTiles = this.state.user1Tiles;
+            currentTiles = currentTiles.concat(randomLetters);
+            console.log(currentTiles);
+            this.setState({ user1Tiles: currentTiles });      
+        } else {
+            alert("No valid words found");
+        }
+    }
+
     /** 
      * Signs user out
      */
@@ -81,17 +103,24 @@ export default class InGameView extends React.Component {
      * Updates the board when a user places a tile on the board and determines
      * whether the user has placed a valid word
      */
-    updateBoard = (xCoord, yCoord) => {
+    updateBoard = (xCoord, yCoord, letterTile) => {
         /** 
          * Updates the state of the board after user places a tile
          */
         this.state.placeTileMode ? this.setState({ userTileSelected : false}) : undefined;
         let newBoard = this.state.letterBoard;
         if(this.state.placeTileMode) {
+            /** 
+             * If the user is in place tile mode, it places a tile and updates the user1Tiles as 
+             * well as the tilesPlacedThisTurn so that the user can't remove tiles that weren't placed
+             * this turn
+             */            
             for(let i = 0; i < this.state.user1Tiles.length; i++) {
                 let tileFound = false;
                 if(this.state.user1Tiles[i].props.randomTile.key === this.state.userLetter.key && !tileFound) {
-                    this.state.tilesPlacedThisTurn.push(this.state.user1Tiles[i].props.randomTile);
+                    let newTilesPlaced = this.state.tilesPlacedThisTurn.slice(0);
+                    newTilesPlaced.push(this.state.user1Tiles[i]);
+                    this.setState({ tilesPlacedThisTurn : newTilesPlaced });
                     let newUserTiles = this.state.user1Tiles.slice(0);
                     newUserTiles.splice(i, 1);
                     this.setState({ user1Tiles : newUserTiles });
@@ -100,8 +129,23 @@ export default class InGameView extends React.Component {
             }
             newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         } else {
-            newBoard[xCoord][yCoord] = "-"; 
-            // Need to do more work on removing tiles and placing back into inventory
+            /** 
+             * If the user is in remove tile mode, it places the tile that was removed
+             * back into the inventory
+             */   
+            for(let i = 0; i < this.state.tilesPlacedThisTurn.length; i++) {
+                let tileFound = false;
+                if(this.state.tilesPlacedThisTurn[i].props.randomTile.key === letterTile && !tileFound) {
+                    let newUserTiles = this.state.user1Tiles.slice(0);
+                    newUserTiles.push(this.state.tilesPlacedThisTurn[i]);
+                    this.setState({ user1Tiles : newUserTiles });
+                    tileFound = true;
+                    let newTilesPlaced = this.state.tilesPlacedThisTurn.slice(0);
+                    newTilesPlaced.splice(i, 1);
+                    this.setState({ tilesPlacedThisTurn : newTilesPlaced });
+                    newBoard[xCoord][yCoord] = "-"; 
+                }
+            }
         }
         this.setState({ letterBoard: newBoard });
     }
@@ -172,6 +216,7 @@ export default class InGameView extends React.Component {
             .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
             .then(this.handleXML)
             .then(this.updateScore)
+            .then(this.addNewTilesToInventory)
             .catch(this.handleError);
     }
 
@@ -194,7 +239,9 @@ export default class InGameView extends React.Component {
      * up the word score and updates the user score accordingly
      */
     updateScore = (word) => {
+        let oldScore = this.state.score1;
         console.log(word);
+        this.setState({ tilesPlacedThisTurn : [] });
         let wordScore = 0;
         for(let i = 0; i < word.length; i++) {
             let character = word.charAt(i);
@@ -203,6 +250,7 @@ export default class InGameView extends React.Component {
         }
         let newScore = this.state.score1 + wordScore;
         this.setState({ score1 : newScore});
+        return !(oldScore === newScore);
     }
 
     /** 
@@ -237,7 +285,7 @@ export default class InGameView extends React.Component {
             let xCoord = i % 12;
             let yCoord = Math.floor(i / 12);
             tiles.push(
-                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} />
+                <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} tilesPlacedThisTurn={this.state.tilesPlacedThisTurn} />
             )
         }
 
