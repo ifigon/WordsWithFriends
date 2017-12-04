@@ -31,11 +31,12 @@ export default class InGameView extends React.Component {
             userLetter: undefined,
             letterBoard: letterBoard,
             usedWords: [],
-            user1Tiles: [],
+            randomLetters: [],
             tilesPlacedThisTurn: [],
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
+            tilesLeft: letterTiles.tile.length, //Need to update tiles left
         };
     }
 
@@ -107,7 +108,7 @@ export default class InGameView extends React.Component {
                     this.setState({ tilesPlacedThisTurn : newTilesPlaced });
                     let newUserTiles = this.state.user1Tiles.slice(0);
                     newUserTiles.splice(i, 1);
-                    this.setState({ user1Tiles : newUserTiles });
+                    this.setState({ randomLetters : newUserTiles });
                     tileFound = true;
                 }
             }
@@ -155,7 +156,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || xCoord == 11) {
+                if(letter === "-" || xCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
@@ -176,7 +177,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || yCoord == 11) {
+                if(letter === "-" || yCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
@@ -185,6 +186,8 @@ export default class InGameView extends React.Component {
                 }
             }
         }
+
+        this.renderShuffled();
     }
 
     /** 
@@ -297,14 +300,14 @@ export default class InGameView extends React.Component {
                     <h1>Words With Friendz</h1>
                     <div className='d-flex'>
                         <div className='user'>{userInitial}</div>
-                        <div>
+                        <div id='1' className='yellow-text'>
                             <p>{this.state.currentUser.displayName}</p>
                             <h5 id="score1">{this.state.score1}</h5>
                         </div>
                     </div>
                     <div className='d-flex'>
                         <div className='user'>C</div>
-                        <div>
+                        <div id='2'>
                             <p>CPU</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
@@ -315,7 +318,9 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {this.state.user1Tiles} 
+                    {this.state.randomLetters.map((random, i) => 
+                        <Tile key={i} callBack={this.selectUserTile} randomTile={random} userTileSelected={this.state.userTileSelected} />
+                    )}
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
@@ -328,6 +333,8 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
+                         <p> {this.state.tilesLeft} Tiles left </p>
+                     {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>

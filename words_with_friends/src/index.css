@@ -28,8 +28,8 @@ p, h1, h2, h3, h4, h5, h6 {
 /**
  * Styles the Link in signin/signup
  */
-span {
-  color: #eeb63f;
+.yellow-text {
+  color: #f4c439;
   text-decoration: none;
 }
 
