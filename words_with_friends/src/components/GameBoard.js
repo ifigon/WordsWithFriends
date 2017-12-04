@@ -40,25 +40,10 @@ export default class InGameView extends React.Component {
     }
 
     componentDidMount() {
-        /**
-         * Shuffles the array of tile objects and randomly selects 7
-         * Pushes the 7 tiles to randomLetters array
-         */
-        let shuffledTiles = this.shuffle(letterTiles.tile);
-        let randomLetters = [];
-        for (let i = 0; i < 7; i++) {
-            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-            let randomTile = shuffledTiles[randomSelect]
-            // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
-            randomLetters.push(
-                <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
-            )
-        }
-        this.setState({ user1Tiles: randomLetters });
+        this.renderShuffled(true);
     }
 
-    addNewTilesToInventory = validTurn => {
-        console.log(validTurn);
+    renderShuffled = validTurn => {
         if(validTurn) {
             let shuffledTiles = this.shuffle(letterTiles.tile);
             let randomLetters = [];
@@ -72,7 +57,6 @@ export default class InGameView extends React.Component {
             }
             let currentTiles = this.state.user1Tiles;
             currentTiles = currentTiles.concat(randomLetters);
-            console.log(currentTiles);
             this.setState({ user1Tiles: currentTiles });      
         } else {
             alert("No valid words found");
@@ -173,7 +157,6 @@ export default class InGameView extends React.Component {
                 } 
                 if(letter === "-" || xCoord == 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
-                        console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
                     }
@@ -195,7 +178,6 @@ export default class InGameView extends React.Component {
                 } 
                 if(letter === "-" || yCoord == 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
-                        console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
                     }
@@ -216,7 +198,7 @@ export default class InGameView extends React.Component {
             .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
             .then(this.handleXML)
             .then(this.updateScore)
-            .then(this.addNewTilesToInventory)
+            .then(this.renderShuffled)
             .catch(this.handleError);
     }
 
@@ -239,18 +221,33 @@ export default class InGameView extends React.Component {
      * up the word score and updates the user score accordingly
      */
     updateScore = (word) => {
-        let oldScore = this.state.score1;
         console.log(word);
-        this.setState({ tilesPlacedThisTurn : [] });
-        let wordScore = 0;
+        if(this.isAlphabetic(word)) {
+            word = word.toLowerCase();
+            let oldScore = this.state.score1;
+            this.setState({ tilesPlacedThisTurn : [] });
+            let wordScore = 0;
+            for(let i = 0; i < word.length; i++) {
+                let character = word.charAt(i);
+                let characterValue = tileValues.tileValues[character];
+                wordScore += characterValue;
+            }
+            let newScore = this.state.score1 + wordScore;
+            this.setState({ score1 : newScore});
+            return !(oldScore === newScore);
+        } else {
+            return false;
+        }
+    }
+
+    isAlphabetic(word) {
         for(let i = 0; i < word.length; i++) {
             let character = word.charAt(i);
-            let characterValue = tileValues.tileValues[character];
-            wordScore += characterValue;
+            if(!character.match(/[a-z]/i)) {
+                return false;
+            }
         }
-        let newScore = this.state.score1 + wordScore;
-        this.setState({ score1 : newScore});
-        return !(oldScore === newScore);
+        return true;
     }
 
     /** 

@@ -9,12 +9,16 @@ export default class BoardTile extends React.Component {
         this.state = {
             letter: "",
             point: undefined,
-            key: undefined
+            key: undefined,
+            tilePlaced: false
         }
     }
 
     handleTilePlace(evt) {
-        if(this.props.placeTileMode) {
+        console.log(this.state.tilePlaced);
+        if(this.props.placeTileMode && !this.state.tilePlaced) {
+            console.log(this.state.tilePlaced);
+            this.setState({ tilePlaced : true });
             evt.classList.add('glass');
             this.setState({
                 letter: this.props.userLetter.letter, 
@@ -22,7 +26,7 @@ export default class BoardTile extends React.Component {
                 key: this.props.userLetter.key
             });
             this.props.callBack(this.props.xCoord, this.props.yCoord, this.state.key);
-        } else {
+        } else if(!this.props.placeTileMode) {
             /** 
              * Checks to make sure the tile was placed this turn before it removes it
              */    
@@ -33,6 +37,7 @@ export default class BoardTile extends React.Component {
                 }
             }
             if(isTileFromThisTurn) {
+                this.setState({ tilePlaced : false });
                 evt.classList.remove('glass');
                 this.setState({
                     letter: "",
