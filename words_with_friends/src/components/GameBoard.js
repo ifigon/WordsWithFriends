@@ -271,6 +271,7 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
+                        <p> {shuffledTiles.length} Tiles left </p>
                     </div>
                 </div>
             </div>
