@@ -35,6 +35,7 @@ export default class InGameView extends React.Component {
             letterBoard: letterBoard,
             usedWords: [],
             user1Tiles: [],
+            tilesPlacedThisTurn: [],
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
@@ -90,9 +91,20 @@ export default class InGameView extends React.Component {
         this.state.placeTileMode ? this.setState({ userTileSelected : false}) : undefined;
         let newBoard = this.state.letterBoard;
         if(this.state.placeTileMode) {
+            for(let i = 0; i < this.state.user1Tiles.length; i++) {
+                let tileFound = false;
+                if(this.state.user1Tiles[i].props.randomTile.key === this.state.userLetter.key && !tileFound) {
+                    this.state.tilesPlacedThisTurn.push(this.state.user1Tiles[i].props.randomTile);
+                    let newUserTiles = this.state.user1Tiles.slice(0);
+                    newUserTiles.splice(i, 1);
+                    this.setState({ user1Tiles : newUserTiles });
+                    tileFound = true;
+                }
+            }
             newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         } else {
             newBoard[xCoord][yCoord] = "-"; 
+            // Need to do more work on removing tiles and placing back into inventory
         }
         this.setState({ letterBoard: newBoard });
     }
