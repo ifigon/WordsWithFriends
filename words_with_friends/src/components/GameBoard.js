@@ -36,22 +36,29 @@ export default class InGameView extends React.Component {
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
+            tilesLeft: letterTiles.tile.length, //Need to update tiles left
         };
     }
 
     componentDidMount() {
-        /**
+     /**
          * Shuffles the array of tile objects and randomly selects 7
          * Pushes the 7 tiles to randomLetters array
+         * also removes the selected tile from the original Tile array
+         * added unique to each tile to know which to remove when letter is used
          */
         let shuffledTiles = this.shuffle(letterTiles.tile);
+        //console.log("shuffled Tile", shuffledTiles.length)
         let randomLetters = [];
-        for (let i = 0; i < 7; i++) {
+        for (let i = randomLetters.length; i < 7; i++) {
             let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+           // console.log(randomSelect)
             let randomTile = shuffledTiles[randomSelect]
-            // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+            shuffledTiles.splice(randomSelect, 1);
+           //console.log("shuffled Tile is now", shuffledTiles.length)
+           //console.log(randomTile.key)
             randomLetters.push(
-                <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                <Tile key={randomTile.key} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
             )
         }
         this.setState({ user1Tiles: randomLetters });
@@ -240,6 +247,7 @@ export default class InGameView extends React.Component {
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} />
             )
         }
+        
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
@@ -283,6 +291,8 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
+                         <p> {this.state.tilesLeft} Tiles left </p>
+                     {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>
