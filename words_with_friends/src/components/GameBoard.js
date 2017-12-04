@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -28,13 +28,38 @@ export default class InGameView extends React.Component {
         this.state = {
             placeTileMode: true,
             userTileSelected: false,
-            letterBoard: letterBoard,
             userLetter: undefined,
+            letterBoard: letterBoard,
             usedWords: [],
+            user1Tiles: [],
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
         };
+    }
+
+    componentDidMount() {
+     /**
+         * Shuffles the array of tile objects and randomly selects 7
+         * Pushes the 7 tiles to randomLetters array
+         * also removes the selected tile from the original Tile array
+         * added unique to each tile to know which to remove when letter is used
+         */
+        let shuffledTiles = this.shuffle(letterTiles.tile);
+        //console.log("shuffled Tile", shuffledTiles.length)
+        let randomLetters = [];
+        for (let i = randomLetters.length; i < 7; i++) {
+            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+           // console.log(randomSelect)
+            let randomTile = shuffledTiles[randomSelect]
+            shuffledTiles.splice(randomSelect, 1);
+           //console.log("shuffled Tile is now", shuffledTiles.length)
+           //console.log(randomTile.key)
+            randomLetters.push(
+                <Tile key={randomTile.key} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+            )
+        }
+        this.setState({ user1Tiles: randomLetters });
     }
 
     /** 
@@ -51,8 +76,10 @@ export default class InGameView extends React.Component {
      * updates the game state to reflect which tile they chose
      */
     selectUserTile = (selectedLetter) => {
-        this.setState({ userTileSelected : true});
-        this.setState({ userLetter: selectedLetter });
+        this.setState({ 
+            userTileSelected : true,
+            userLetter: selectedLetter
+        });
     }
 
     /** 
@@ -208,26 +235,6 @@ export default class InGameView extends React.Component {
             )
         }
         
-        /**
-         * Shuffles the array of tile objects and randomly selects 7
-         * Pushes the 7 tiles to randomLetters array
-         * also removes the selected tile from the original Tile array
-         * added unique to each tile to know which to remove when letter is used
-         */
-        let shuffledTiles = this.shuffle(letterTiles.tile);
-        //console.log("shuffled Tile", shuffledTiles.length)
-        let randomLetters = [];
-        for (let i = randomLetters.length; i < 7; i++) {
-            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-           // console.log(randomSelect)
-            let randomTile = shuffledTiles[randomSelect]
-            shuffledTiles.splice(randomSelect, 1);
-           //console.log("shuffled Tile is now", shuffledTiles.length)
-           //console.log(randomTile.key)
-            randomLetters.push(
-                <Tile key={randomTile.key} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
-            )
-        }
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
@@ -258,7 +265,7 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {randomLetters}
+                    {this.state.user1Tiles} 
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
@@ -271,7 +278,8 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
-                        <p> {shuffledTiles.length} Tiles left </p>
+                         <p>  Tiles left </p>
+                     {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>
