@@ -6,7 +6,6 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-<<<<<<< HEAD
 
 import Tile from "./tile";
 
@@ -134,22 +133,6 @@ export default class InGameView extends React.Component {
          * Same algorithm as above only this time it looks for vertical words not horizontal words. So
          * it starts at coordinate 0,0 then 0,1 then 0,2 etc.
          */
-        let myHeaders = new Headers();
-        myHeaders.append({"Accept": "application/json",
-                "app_id": "b5e5a7fc",
-                "app_key": "678924caca3d72ba440b841c7ddf0890"});
-        let init = {headers: myHeaders};
-        const request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/" + xWord, init);
-
-        /** 
-         * Calls on Oxford dictionary API to determine whether the user
-         * has placed a valid word
-         */
-        fetch(request)
-            .then(this.handleResponse)
-            .then(this.updateScore)
-            .catch(this.handleError);
-        
         for(let xCoord = 0; xCoord < 12; xCoord++) {
             let possibleWord = "";
             for(let yCoord = 0; yCoord < 12; yCoord++) {
@@ -167,7 +150,22 @@ export default class InGameView extends React.Component {
                 }
             }
         }
->>>>>>> 5a14ddddf0cf716defe059cb77f6186fd0ff60ed
+//        let myHeaders = new Headers();
+//        myHeaders.append({"Accept": "application/json",
+//                "app_id": "b5e5a7fc",
+//                "app_key": "678924caca3d72ba440b841c7ddf0890"});
+//        let init = {headers: myHeaders};
+//        const request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/" + xWord, init);
+//
+//        /** 
+//         * Calls on Oxford dictionary API to determine whether the user
+//         * has placed a valid word
+//         */
+//        fetch(request)
+//            .then(this.handleResponse)
+//            .then(this.updateScore)
+//            .catch(this.handleError);
+        
     }
 
     /** 
