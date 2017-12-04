@@ -5,9 +5,7 @@ import firebase from 'firebase/app';
 import { Redirect } from 'react-router-dom';
 import constants from './constants';
 import letterTiles from '../tiles';
-
 import BoardTile from "./BoardTile";
-
 import Tile from "./Tile";
 
 export default class InGameView extends React.Component {
@@ -29,6 +27,8 @@ export default class InGameView extends React.Component {
             userTileSelected: false,
             letterBoard: letterBoard,
             userLetter: undefined,
+            xWord: '',
+            yWord: '',
             currentUser: firebase.auth().currentUser,
             error: ''
         };
@@ -95,6 +95,13 @@ export default class InGameView extends React.Component {
         console.log(xWord);
         console.log(yWord);
 
+        if (xWord.length >= 2) {
+            this.setState({xWord: xWord.toLowerCase()});
+        }
+        if (yWord.length >= 2) {
+            this.setState({yWord: yWord.toLowerCase()});
+        }
+
         /** 
          * Creates the request used for the Oxford API call
          */
@@ -115,7 +122,42 @@ export default class InGameView extends React.Component {
             .then(this.updateScore)
             .catch(this.handleError);
         */
+
+
     }
+
+    /**
+     * START OF WYNSTON'S TESTS: IN PROGRESS
+     */
+    checkWord() {
+        console.log('word in state ' + this.state.xWord);
+        console.log('word in state ' + this.state.yWord);
+        this.fetchWord(this.state.xWord);
+        this.fetchWord(this.state.yWord);
+    }
+
+    fetchWord(word) {
+        const API_KEY = '?key=92de68e0-2615-460b-9152-16088d0944b7';
+        const QUERY = 'https://www.dictionaryapi.com/api/v1/references/collegiate/xml/';
+        fetch(QUERY + word + API_KEY)
+            .then(response => response.text())
+            .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+            .then(this.handleXML)
+            .catch(this.handleError);
+    }
+
+    handleXML(data) {
+        console.log(data);
+        if (data
+            && data.getElementsByTagName('ew')[0] !== undefined) {
+            let word = data.getElementsByTagName('ew')[0].childNodes[0].nodeValue;
+            console.log('word in dictionary ' + word);
+            return true; //word exists in dictionary
+        }
+    }
+    /**
+     * END OF WYNSTON'S TESTS: IN PROGRESS
+     */
 
     /** 
      * Used in AJAX call to handle error
@@ -230,7 +272,7 @@ export default class InGameView extends React.Component {
                     {randomLetters}
                 </div>
                 <div className='row justify-content-center banner'>
-                    <button className='btn btn-success'>Play</button>
+                    <button onClick={() => this.checkWord()} className='btn btn-success'>Play</button>
                 </div>
             </div>
         );
