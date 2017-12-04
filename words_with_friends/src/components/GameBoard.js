@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -33,10 +33,10 @@ export default class InGameView extends React.Component {
             usedWords: [],
             randomLetters: [],
             tilesPlacedThisTurn: [],
+            user1Tiles: [],
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
-            tilesLeft: letterTiles.tile.length, //Need to update tiles left
         };
     }
 
@@ -318,9 +318,7 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {this.state.randomLetters.map((random, i) => 
-                        <Tile key={i} callBack={this.selectUserTile} randomTile={random} userTileSelected={this.state.userTileSelected} />
-                    )}
+                    {this.state.user1Tiles}
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
