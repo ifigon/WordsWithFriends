@@ -211,15 +211,21 @@ export default class InGameView extends React.Component {
         /**
          * Shuffles the array of tile objects and randomly selects 7
          * Pushes the 7 tiles to randomLetters array
+         * also removes the selected tile from the original Tile array
+         * added unique to each tile to know which to remove when letter is used
          */
         let shuffledTiles = this.shuffle(letterTiles.tile);
+        //console.log("shuffled Tile", shuffledTiles.length)
         let randomLetters = [];
-        for (let i = 0; i < 7; i++) {
+        for (let i = randomLetters.length; i < 7; i++) {
             let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+           // console.log(randomSelect)
             let randomTile = shuffledTiles[randomSelect]
-            // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+            shuffledTiles.splice(randomSelect, 1);
+           //console.log("shuffled Tile is now", shuffledTiles.length)
+           //console.log(randomTile.key)
             randomLetters.push(
-                <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                <Tile key={randomTile.key} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
             )
         }
 
