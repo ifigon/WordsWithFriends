@@ -34,7 +34,28 @@ export default class InGameView extends React.Component {
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
+            randomLetters: []
         };
+    }
+
+    componentDidMount() {
+        this.renderShuffled();
+    }
+    
+    /**
+     * 
+     */
+    renderShuffled() {
+        let shuffledTiles = this.shuffle(letterTiles.tile);
+        let randomTiles = [];
+        for (let i = 0; i < 7; i++) {
+            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+            let randomTile = shuffledTiles[randomSelect]
+            randomTiles.push(
+                randomTile
+            )
+        }
+        this.setState({randomLetters: randomTiles});
     }
 
     /** 
@@ -94,7 +115,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || xCoord == 11) {
+                if(letter === "-" || xCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
@@ -116,7 +137,7 @@ export default class InGameView extends React.Component {
                 if(letter !== "-") {
                     possibleWord += letter;
                 } 
-                if(letter === "-" || yCoord == 11) {
+                if(letter === "-" || yCoord === 11) {
                     if(possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
                         console.log(possibleWord);
                         this.state.usedWords.push(possibleWord);
@@ -126,6 +147,8 @@ export default class InGameView extends React.Component {
                 }
             }
         }
+
+        this.renderShuffled();
     }
 
     /** 
@@ -212,15 +235,15 @@ export default class InGameView extends React.Component {
          * Shuffles the array of tile objects and randomly selects 7
          * Pushes the 7 tiles to randomLetters array
          */
-        let shuffledTiles = this.shuffle(letterTiles.tile);
-        let randomLetters = [];
-        for (let i = 0; i < 7; i++) {
-            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-            let randomTile = shuffledTiles[randomSelect]
-            randomLetters.push(
-                <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
-            )
-        }
+        // let shuffledTiles = this.shuffle(letterTiles.tile);
+        // let randomTiles = [];
+        // for (let i = 0; i < 7; i++) {
+        //     let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+        //     let randomTile = shuffledTiles[randomSelect]
+        //     randomTiles.push(
+        //         <Tile key={i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+        //     )
+        // }
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
@@ -233,14 +256,14 @@ export default class InGameView extends React.Component {
                     <h1>Words With Friendz</h1>
                     <div className='d-flex'>
                         <div className='user'>{userInitial}</div>
-                        <div>
+                        <div id='1' className='yellow-text'>
                             <p>{this.state.currentUser.displayName}</p>
                             <h5 id="score1">{this.state.score1}</h5>
                         </div>
                     </div>
                     <div className='d-flex'>
                         <div className='user'>C</div>
-                        <div>
+                        <div id='2'>
                             <p>CPU</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
@@ -251,7 +274,9 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {randomLetters}
+                    {this.state.randomLetters.map((random, i) => 
+                        <Tile key={i} callBack={this.selectUserTile} randomTile={random} userTileSelected={this.state.userTileSelected} />
+                    )}
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
