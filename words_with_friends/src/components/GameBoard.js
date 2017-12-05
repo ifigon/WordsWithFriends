@@ -32,7 +32,6 @@ export default class InGameView extends React.Component {
             placeTileMode: true,
             userTileSelected: false,
             userLetter: undefined,
-            startGame: false,
             letterBoard: letterBoard,
             usedWords: [],
             user1Tiles: [],
@@ -52,16 +51,30 @@ export default class InGameView extends React.Component {
         if(validTurn) {
             let shuffledTiles = this.shuffle(letterTiles.tile);
             let randomLetters = [];
-            for (let i = this.state.user1Tiles.length; i < 7; i++) {
-                let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
-                let randomTile = shuffledTiles[randomSelect]
-                // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
-                randomLetters.push(
-                    <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
-                )
-            }
             let currentTiles = this.state.user1Tiles;
-            currentTiles = currentTiles.concat(randomLetters);
+            if (this.state.user1Tiles.length === 7) {
+                this.setState({user1Tiles: []});
+                for (let i = 0; i < 7; i++) {
+                    let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+                    let randomTile = shuffledTiles[randomSelect]
+                    // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+                    randomLetters.push(
+                        <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                    )
+                } 
+                currentTiles = randomLetters;
+            } else {
+                for (let i = this.state.user1Tiles.length; i < 7; i++) {
+                    let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+                    let randomTile = shuffledTiles[randomSelect]
+                    // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+                    randomLetters.push(
+                        <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                    )
+                }
+                currentTiles = currentTiles.concat(randomLetters);
+            }
+    
             this.setState({ user1Tiles: currentTiles }); 
             this.setState({ tilesPlacedThisTurn : [] });            
         } else {
@@ -365,6 +378,9 @@ export default class InGameView extends React.Component {
                         </div>
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
+                        </div>
+                        <div className="ml-2">
+                            <button onClick={() => this.renderShuffled(true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-danger'>Shuffle Letters</button>
                         </div>
                         <p> {this.state.tilesLeft} Tiles left </p>
                         {/* {shuffledTiles.length} This has to go inside <P>*/}
