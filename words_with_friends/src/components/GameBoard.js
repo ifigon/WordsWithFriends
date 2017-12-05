@@ -7,6 +7,7 @@ import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
 import Tile from "./tile";
+import Countdown from 'react-countdown-now';
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -29,6 +30,7 @@ export default class InGameView extends React.Component {
             placeTileMode: true,
             userTileSelected: false,
             userLetter: undefined,
+            startGame: false,
             letterBoard: letterBoard,
             usedWords: [],
             user1Tiles: [],
@@ -74,6 +76,10 @@ export default class InGameView extends React.Component {
             .catch(err => this.setState({ error: err.message }));
     }
 
+    handleStartGame() {
+        this.setState({startGame: true});
+    }
+
     /** 
      * When a user picks a tile that they want to put down from the user tiles,
      * updates the game state to reflect which tile they chose
@@ -81,7 +87,7 @@ export default class InGameView extends React.Component {
     selectUserTile = (selectedLetter) => {
         this.setState({ 
             userTileSelected : true,
-            userLetter: selectedLetter
+            userLetter: selectedLetter,
         });
     }
 
@@ -286,10 +292,19 @@ export default class InGameView extends React.Component {
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} tilesPlacedThisTurn={this.state.tilesPlacedThisTurn} />
             )
         }
+        
+//        renderTimer() {
+//            return (
+//                <Countdown date={Date.now() + 60000}>
+//                    <span>Game over! </span>
+//                </Countdown>    
+//            );
+//        }
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
          */
+        /*need to fix timer so that it does not reset everytime user invokes change in state*/
         let userInitial = this.state.currentUser.displayName.charAt(0);
 
         return (
@@ -309,6 +324,10 @@ export default class InGameView extends React.Component {
                             <p>CPU</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
+                    </div>
+                    <div>
+                        <button onClick={() => this.handleStartGame()}type='button' className='btn btn-success'>Start Game {this.state.startGame ?  <div><Countdown date={Date.now() + 60000}>
+                        <span>Game over! </span></Countdown></div> : null}</button>
                     </div>
                     <div><button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>Sign Out</button></div>
                 </div>
