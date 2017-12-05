@@ -31,9 +31,9 @@ export default class InGameView extends React.Component {
             userLetter: undefined,
             letterBoard: letterBoard,
             usedWords: [],
-            randomLetters: [],
-            tilesPlacedThisTurn: [],
             user1Tiles: [],
+            tilesPlacedThisTurn: [],
+            tilesLeft: letterTiles.tile.length, //Need to update tiles left
             score1 : 0,
             score2: 0,
             currentUser: firebase.auth().currentUser,
@@ -58,7 +58,8 @@ export default class InGameView extends React.Component {
             }
             let currentTiles = this.state.user1Tiles;
             currentTiles = currentTiles.concat(randomLetters);
-            this.setState({ user1Tiles: currentTiles });      
+            this.setState({ user1Tiles: currentTiles }); 
+            this.setState({ tilesPlacedThisTurn : [] });            
         } else {
             alert("No valid words found");
         }
@@ -108,7 +109,7 @@ export default class InGameView extends React.Component {
                     this.setState({ tilesPlacedThisTurn : newTilesPlaced });
                     let newUserTiles = this.state.user1Tiles.slice(0);
                     newUserTiles.splice(i, 1);
-                    this.setState({ randomLetters : newUserTiles });
+                    this.setState({ user1Tiles : newUserTiles });
                     tileFound = true;
                 }
             }
@@ -186,8 +187,6 @@ export default class InGameView extends React.Component {
                 }
             }
         }
-
-        this.renderShuffled();
     }
 
     /** 
@@ -228,7 +227,6 @@ export default class InGameView extends React.Component {
         if(this.isAlphabetic(word)) {
             word = word.toLowerCase();
             let oldScore = this.state.score1;
-            this.setState({ tilesPlacedThisTurn : [] });
             let wordScore = 0;
             for(let i = 0; i < word.length; i++) {
                 let character = word.charAt(i);
@@ -318,7 +316,7 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {this.state.user1Tiles}
+                    {this.state.user1Tiles} 
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
@@ -331,8 +329,8 @@ export default class InGameView extends React.Component {
                         <div className="ml-2">
                             <button onClick={() => this.setState({ placeTileMode: false, userTileSelected : true, userLetter : undefined})} disabled={!this.state.placeTileMode} className='btn btn-danger'>Remove Tile Mode</button>
                         </div>
-                         <p> {this.state.tilesLeft} Tiles left </p>
-                     {/* {shuffledTiles.length} This has to go inside <P>*/}
+                        <p> {this.state.tilesLeft} Tiles left </p>
+                        {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>

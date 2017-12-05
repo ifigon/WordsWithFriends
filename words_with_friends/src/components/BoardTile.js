@@ -1,4 +1,7 @@
 import React from 'react';
+import firebase from 'firebase/app';
+import { Redirect } from 'react-router-dom';
+import constants from './constants';
 
 export default class BoardTile extends React.Component {
     constructor(props) {
@@ -27,6 +30,7 @@ export default class BoardTile extends React.Component {
             /** 
              * Checks to make sure the tile was placed this turn before it removes it
              */    
+            console.log("test");
             let isTileFromThisTurn = false;
             for(let i = 0; i < this.props.tilesPlacedThisTurn.length; i++) {
                 if(this.props.tilesPlacedThisTurn[i].props.randomTile.key === this.state.key && !isTileFromThisTurn) {
