@@ -32,37 +32,76 @@ export default class InGameView extends React.Component {
             letterBoard: letterBoard,
             usedWords: [],
             user1Tiles: [],
+            user2Tiles: [],
             tilesPlacedThisTurn: [],
             tilesLeft: letterTiles.tile.length, //Need to update tiles left
             score1 : 0,
             score2: 0,
+            player1Active: false,
+            turnNumber: 0,
             currentUser: firebase.auth().currentUser,
         };
     }
 
     componentDidMount() {
         this.renderShuffled(true);
+        this.finishSetUp();
     }
 
     renderShuffled = validTurn => {
+        console.log("test");
         if(validTurn) {
+            let newTurnNumber = this.state.turnNumber + 1;
             let shuffledTiles = this.shuffle(letterTiles.tile);
             let randomLetters = [];
-            for (let i = this.state.user1Tiles.length; i < 7; i++) {
+            let tileNumber = 0;
+            this.state.player1Active ? tileNumber = this.state.user1Tiles.length : tileNumber = this.state.user2Tiles.length;
+            for (let i = tileNumber; i < 7; i++) {
                 let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
                 let randomTile = shuffledTiles[randomSelect]
                 // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
                 randomLetters.push(
-                    <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                    <Tile key={Math.random() * (i + 1)} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
                 )
             }
-            let currentTiles = this.state.user1Tiles;
+            let currentTiles = undefined;
+            this.state.player1Active ? currentTiles = this.state.user1Tiles : currentTiles = this.state.user2Tiles;
             currentTiles = currentTiles.concat(randomLetters);
-            this.setState({ user1Tiles: currentTiles }); 
-            this.setState({ tilesPlacedThisTurn : [] });            
+            if(this.state.player1Active) {
+                this.setState({ user1Tiles: currentTiles }); 
+            } else {
+                this.setState({ user2Tiles: currentTiles });
+            }
+            this.setState({ tilesPlacedThisTurn : [] });
+            if(newTurnNumber > 1) {
+                if(this.state.player1Active) {
+                    document.querySelector("#user1").classList.remove("yellow-text");
+                    document.querySelector("#user2").classList.add("yellow-text");
+                } else {
+                    document.querySelector("#user2").classList.remove("yellow-text");
+                    document.querySelector("#user1").classList.add("yellow-text");               
+                }
+            }
+            let newTurn = !this.state.player1Active; 
+            this.setState({ player1Active : newTurn });  
+            this.setState({ turnNumber : this.state.turnNumber + 1 });        
         } else {
             alert("No valid words found");
         }
+    }
+
+    finishSetUp() {
+        let randomLetters = [];
+        let shuffledTiles = this.shuffle(letterTiles.tile);        
+        for (let i = 0; i < 7; i++) {
+            let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+            let randomTile = shuffledTiles[randomSelect]
+            // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+            randomLetters.push(
+                <Tile key={Math.random() * (i + 1)} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+            )
+        }    
+        this.setState({ user1Tiles : randomLetters });   
     }
 
     /** 
@@ -97,21 +136,14 @@ export default class InGameView extends React.Component {
         let newBoard = this.state.letterBoard;
         if(this.state.placeTileMode) {
             /** 
-             * If the user is in place tile mode, it places a tile and updates the user1Tiles as 
+             * If the user is in place tile mode, it places a tile and updates the user tiles as 
              * well as the tilesPlacedThisTurn so that the user can't remove tiles that weren't placed
              * this turn
              */            
-            for(let i = 0; i < this.state.user1Tiles.length; i++) {
-                let tileFound = false;
-                if(this.state.user1Tiles[i].props.randomTile.key === this.state.userLetter.key && !tileFound) {
-                    let newTilesPlaced = this.state.tilesPlacedThisTurn.slice(0);
-                    newTilesPlaced.push(this.state.user1Tiles[i]);
-                    this.setState({ tilesPlacedThisTurn : newTilesPlaced });
-                    let newUserTiles = this.state.user1Tiles.slice(0);
-                    newUserTiles.splice(i, 1);
-                    this.setState({ user1Tiles : newUserTiles });
-                    tileFound = true;
-                }
+            if(this.state.player1Active) {
+                this.updateInventory(this.state.user1Tiles);
+            } else {
+                this.updateInventory(this.state.user2Tiles);
             }
             newBoard[xCoord][yCoord] = this.state.userLetter.letter; 
         } else {
@@ -122,9 +154,10 @@ export default class InGameView extends React.Component {
             for(let i = 0; i < this.state.tilesPlacedThisTurn.length; i++) {
                 let tileFound = false;
                 if(this.state.tilesPlacedThisTurn[i].props.randomTile.key === letterTile && !tileFound) {
-                    let newUserTiles = this.state.user1Tiles.slice(0);
+                    let newUserTiles = [];
+                    this.state.player1Active ? newUserTiles = this.state.user1Tiles.slice(0) : newUserTiles = this.state.user2Tiles.slice(0);
                     newUserTiles.push(this.state.tilesPlacedThisTurn[i]);
-                    this.setState({ user1Tiles : newUserTiles });
+                    this.state.player1Active ? this.setState({ user1Tiles : newUserTiles }) : this.setState ({ user2Tiles : newUserTiles });
                     tileFound = true;
                     let newTilesPlaced = this.state.tilesPlacedThisTurn.slice(0);
                     newTilesPlaced.splice(i, 1);
@@ -134,6 +167,25 @@ export default class InGameView extends React.Component {
             }
         }
         this.setState({ letterBoard: newBoard });
+    }
+
+    updateInventory(userTiles) {
+        for(let i = 0; i < userTiles.length; i++) {
+            let tileFound = false;
+            if(userTiles[i].props.randomTile.key === this.state.userLetter.key && !tileFound) {
+                let newTilesPlaced = this.state.tilesPlacedThisTurn.slice(0);
+                newTilesPlaced.push(userTiles[i]);
+                this.setState({ tilesPlacedThisTurn : newTilesPlaced });
+                let newUserTiles = userTiles.slice(0);
+                newUserTiles.splice(i, 1);
+                if(this.state.player1Active) {
+                    this.setState({ user1Tiles : newUserTiles });
+                } else {
+                    this.setState({ user2Tiles : newUserTiles });
+                }
+                tileFound = true;
+            }
+        }
     }
 
     /** 
@@ -208,7 +260,6 @@ export default class InGameView extends React.Component {
      * Uses the dictionary api to check if the passed in word is valid
      */
     handleXML(data) {
-        console.log(data);
         if (data && data.getElementsByTagName('ew')[0] !== undefined) {
             let word = data.getElementsByTagName('ew')[0].childNodes[0].nodeValue;
             console.log('word in dictionary ' + word);
@@ -223,18 +274,28 @@ export default class InGameView extends React.Component {
      * up the word score and updates the user score accordingly
      */
     updateScore = (word) => {
-        console.log(word);
         if(this.isAlphabetic(word)) {
             word = word.toLowerCase();
-            let oldScore = this.state.score1;
+            let oldScore = 0;
+            if(this.state.player1Active) {
+                oldScore = this.state.score1;
+            } else {
+                oldScore = this.state.score2;
+            }
             let wordScore = 0;
             for(let i = 0; i < word.length; i++) {
                 let character = word.charAt(i);
                 let characterValue = tileValues.tileValues[character];
                 wordScore += characterValue;
             }
-            let newScore = this.state.score1 + wordScore;
-            this.setState({ score1 : newScore});
+            let newScore = 0;
+            if(this.state.player1Active) {
+                newScore = this.state.score1 + wordScore;
+                this.setState({ score1 : newScore});
+            } else {
+                newScore = this.state.score2 + wordScore;
+                this.setState({ score2 : newScore });
+            }
             return !(oldScore === newScore);
         } else {
             return false;
@@ -266,7 +327,7 @@ export default class InGameView extends React.Component {
         return array;
     }
   
-    render() {
+    render() {  
         /** 
          * Reditects the page if user is not signed in 
          */
@@ -298,15 +359,15 @@ export default class InGameView extends React.Component {
                     <h1>Words With Friendz</h1>
                     <div className='d-flex'>
                         <div className='user'>{userInitial}</div>
-                        <div id='1' className='yellow-text'>
+                        <div id='user1' className='yellow-text'>
                             <p>{this.state.currentUser.displayName}</p>
                             <h5 id="score1">{this.state.score1}</h5>
                         </div>
                     </div>
                     <div className='d-flex'>
-                        <div className='user'>C</div>
-                        <div id='2'>
-                            <p>CPU</p>
+                        <div className='user'>G</div>
+                        <div id='user2'>
+                            <p>Guest</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
                     </div>
@@ -316,7 +377,7 @@ export default class InGameView extends React.Component {
                     {tiles}
                 </div>
                 <div className='row justify-content-center letter-drawer'>
-                    {this.state.user1Tiles} 
+                    {this.state.player1Active ? this.state.user1Tiles : this.state.user2Tiles }; 
                 </div>
                 <div className='row justify-content-center banner'>
                     <div className="mr-5">
