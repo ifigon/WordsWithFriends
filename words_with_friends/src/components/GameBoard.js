@@ -7,6 +7,9 @@ import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
 import Tile from "./tile";
+import Countdown from 'react-countdown-now';
+
+const OXFORD_API_URL = "https://od-api.oxforddictionaries.com/api/v1"
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -29,6 +32,7 @@ export default class InGameView extends React.Component {
             placeTileMode: true,
             userTileSelected: false,
             userLetter: undefined,
+            startGame: false,
             letterBoard: letterBoard,
             usedWords: [],
             user1Tiles: [],
@@ -113,6 +117,10 @@ export default class InGameView extends React.Component {
             .catch(err => this.setState({ error: err.message }));
     }
 
+//    handleStartGame() {
+//        this.setState({startGame: true});
+//    }
+
     /** 
      * When a user picks a tile that they want to put down from the user tiles,
      * updates the game state to reflect which tile they chose
@@ -120,7 +128,7 @@ export default class InGameView extends React.Component {
     selectUserTile = (selectedLetter) => {
         this.setState({ 
             userTileSelected : true,
-            userLetter: selectedLetter
+            userLetter: selectedLetter,
         });
     }
 
@@ -239,6 +247,22 @@ export default class InGameView extends React.Component {
                 }
             }
         }
+//        let myHeaders = new Headers();
+//        myHeaders.append({"Accept": "application/json",
+//                "app_id": "b5e5a7fc",
+//                "app_key": "678924caca3d72ba440b841c7ddf0890"});
+//        let init = {headers: myHeaders};
+//        const request = new Request("https://od-api.oxforddictionaries.com:443/api/v1/inflections/en/" + xWord, init);
+//
+//        /** 
+//         * Calls on Oxford dictionary API to determine whether the user
+//         * has placed a valid word
+//         */
+//        fetch(request)
+//            .then(this.handleResponse)
+//            .then(this.updateScore)
+//            .catch(this.handleError);
+        
     }
 
     /** 
@@ -347,10 +371,23 @@ export default class InGameView extends React.Component {
                 <BoardTile key={i} callBack={this.updateBoard} xCoord={xCoord} yCoord={yCoord} userLetter={this.state.userLetter} userTileSelected={this.state.userTileSelected} placeTileMode={this.state.placeTileMode} tilesPlacedThisTurn={this.state.tilesPlacedThisTurn} />
             )
         }
+        
+//        renderTimer() {
+//            return (
+//                <Countdown date={Date.now() + 60000}>
+//                    <span>Game over! </span>
+//                </Countdown>    
+//            );
+//        }
+        
+//        <div>
+//            <button onClick={() => this.handleStartGame()}type='button' className='btn btn-success'>Start Game {this.state.startGame ?  <div><Countdown date={Date.now() + 60000}><span>Game over! </span></Countdown></div> : null}</button>
+//        </div>
 
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
          */
+        /*need to fix timer so that it does not reset everytime user invokes change in state*/
         let userInitial = this.state.currentUser.displayName.charAt(0);
 
         return (
