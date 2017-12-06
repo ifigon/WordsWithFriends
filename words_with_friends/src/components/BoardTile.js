@@ -20,6 +20,7 @@ export default class BoardTile extends React.Component {
             console.log(this.state.tilePlaced);
             this.setState({ tilePlaced : true });
             evt.classList.add('glass');
+            evt.classList.remove('tile');
             this.setState({
                 letter: this.props.userLetter.letter, 
                 point: this.props.userLetter.point,
@@ -40,6 +41,7 @@ export default class BoardTile extends React.Component {
             if(isTileFromThisTurn) {
                 this.setState({ tilePlaced : false });
                 evt.classList.remove('glass');
+                evt.classList.add('tile');
                 this.setState({
                     letter: "",
                     point: undefined,
@@ -52,8 +54,8 @@ export default class BoardTile extends React.Component {
 
     render() {
         return (
-            <div className="col-1 p-0 tile-button">
-                <button onClick={(evt) => this.handleTilePlace(evt.currentTarget)} className="w-100 h-100" disabled={!this.props.userTileSelected}>{this.state.letter}<sup>{this.state.point}</sup></button>
+            <div className="col-1 p-1 tile-button">
+                <button onClick={(evt) => this.handleTilePlace(evt.currentTarget)} className="w-100 h-100 tile text-center" disabled={!this.props.userTileSelected}>{this.state.letter}<sup>{this.state.point}</sup></button>
             </div>
         )
     }

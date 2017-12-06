@@ -43,7 +43,14 @@ h1 {
 }
 
 .tile-button {
-  height: 45px;
+  height: 60px;
+}
+
+.tile {
+  border: 1px solid #8fa0b3;
+  border-radius: 10px;
+  box-shadow: 0px 5px 4px -2px #8fa0b3 inset;
+  background: linear-gradient(#b3bbc7, #e4e6e5)
 }
 
 /**
@@ -63,6 +70,9 @@ h1 {
  * Style for the user scoreboard tile
  */
 .user {
+  height: 45px;
+  width: 45px;
+
   border: 1px;  
   border-radius: 5px;
   padding: 3px 10px;
