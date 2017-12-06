@@ -15,9 +15,7 @@ export default class BoardTile extends React.Component {
     }
 
     handleTilePlace(evt) {
-        console.log(this.state.tilePlaced);
         if(this.props.placeTileMode && !this.state.tilePlaced) {
-            console.log(this.state.tilePlaced);
             this.setState({ tilePlaced : true });
             evt.classList.add('glass');
             evt.classList.remove('tile');
@@ -31,7 +29,6 @@ export default class BoardTile extends React.Component {
             /** 
              * Checks to make sure the tile was placed this turn before it removes it
              */    
-            console.log("test");
             let isTileFromThisTurn = false;
             for(let i = 0; i < this.props.tilesPlacedThisTurn.length; i++) {
                 if(this.props.tilesPlacedThisTurn[i].props.randomTile.key === this.state.key && !isTileFromThisTurn) {
