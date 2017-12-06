@@ -41,6 +41,7 @@ export default class InGameView extends React.Component {
             user1Tiles: [],
             user2Tiles: [],
             tilesPlacedThisTurn: [],
+            remainingTurns: 15,
             score1: 0,
             score2: 0,
             player1Active: false,
@@ -84,6 +85,7 @@ export default class InGameView extends React.Component {
                 } else {
                     document.querySelector("#user2").classList.remove("yellow-text");
                     document.querySelector("#user1").classList.add("yellow-text");
+                    this.setState({remainingTurns: this.state.remainingTurns - 1});
                 }
             }
             let newTurn = !this.state.player1Active;
@@ -93,6 +95,7 @@ export default class InGameView extends React.Component {
             this.setState({ error : undefined });
             this.setState({ player1Active: newTurn });
             this.setState({ turnNumber: this.state.turnNumber + 1 });
+
             console.log(this.state.userTileSelected);
         } else {
             this.setState({ error: 'No valid words found' });
@@ -311,6 +314,12 @@ export default class InGameView extends React.Component {
                 newScore = this.state.score2 + wordScore;
                 this.setState({ score2: newScore });
             }
+            if (!this.state.player1Active && this.state.turnNumber === 30) {
+                let winner = this.state.currentUser.displayName;
+                this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
+                alert("Game over! " + winner + " won the game! Want to play another game?");
+                document.addEventListener("keydown", window.location.reload());
+            }
             return !(oldScore === newScore);
         } else {
             return false;
@@ -390,6 +399,9 @@ export default class InGameView extends React.Component {
                             <p>Guest</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
+                    </div>
+                    <div>
+                        <span>Remaining Turns: {this.state.remainingTurns}</span>
                     </div>
                     <div>
                         <button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>
