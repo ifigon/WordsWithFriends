@@ -311,11 +311,6 @@ export default class InGameView extends React.Component {
                 newScore = this.state.score2 + wordScore;
                 this.setState({ score2: newScore });
             }
-            if (!this.state.player1Active && this.state.turnNumber === 2) {
-                let winner = this.state.currentUser.displayName;
-                this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
-                alert("Game over! " + winner + " won the game!");
-            }
             return !(oldScore === newScore);
         } else {
             return false;
@@ -395,9 +390,6 @@ export default class InGameView extends React.Component {
                             <p>Guest</p>
                             <h5 id="score2">{this.state.score2}</h5>
                         </div>
-                    </div>
-                    <div>
-                        <span>Turn Number: {this.state.turnNumber}</span>
                     </div>
                     <div>
                         <button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>
