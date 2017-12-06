@@ -11,7 +11,6 @@ import Alert from './Alert';
 
 const API_KEY = '?key=92de68e0-2615-460b-9152-16088d0944b7';
 const QUERY = 'https://www.dictionaryapi.com/api/v1/references/collegiate/xml/';
-// const OXFORD_API_URL = "https://od-api.oxforddictionaries.com/api/v1"
 
 export default class InGameView extends React.Component {
     constructor(props) {
@@ -46,11 +45,12 @@ export default class InGameView extends React.Component {
             score2: 0,
             player1Active: false,
             turnNumber: 0,
+            shuffledLastTurn: false,
             currentUser: firebase.auth().currentUser,
             error: '',
         };
     }
-
+    
     componentDidMount() {
         this.renderShuffled(true, false);
         let randomLetters = this.buildUpTiles(0);
@@ -69,8 +69,10 @@ export default class InGameView extends React.Component {
             this.state.player1Active ? currentTiles = this.state.user1Tiles : currentTiles = this.state.user2Tiles;
             if(!resetTiles) {
                 currentTiles = currentTiles.concat(randomLetters);
+                this.setState({ shuffledLastTurn : false});
             } else {
                 currentTiles = randomLetters;
+                this.setState({ shuffledLastTurn : true });
             }
             if (this.state.player1Active) {
                 this.setState({ user1Tiles: currentTiles });
@@ -95,8 +97,7 @@ export default class InGameView extends React.Component {
             this.setState({ error : undefined });
             this.setState({ player1Active: newTurn });
             this.setState({ turnNumber: this.state.turnNumber + 1 });
-
-            console.log(this.state.userTileSelected);
+            this.checkIfGameOver();
         } else {
             this.setState({ error: 'No valid words found' });
         }
@@ -113,6 +114,15 @@ export default class InGameView extends React.Component {
             )
         }
         return randomLetters;
+    }
+
+    checkIfGameOver() {
+        if (this.state.turnNumber === 30) {
+            let winner = this.state.currentUser.displayName;
+            this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
+            alert("Game over! " + winner + " won the game! Want to play another game?");
+            document.addEventListener("keydown", window.location.reload());
+        }
     }
 
     /** 
@@ -314,12 +324,6 @@ export default class InGameView extends React.Component {
                 newScore = this.state.score2 + wordScore;
                 this.setState({ score2: newScore });
             }
-            if (!this.state.player1Active && this.state.turnNumber === 30) {
-                let winner = this.state.currentUser.displayName;
-                this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
-                alert("Game over! " + winner + " won the game! Want to play another game?");
-                document.addEventListener("keydown", window.location.reload());
-            }
             return !(oldScore === newScore);
         } else {
             return false;
@@ -410,10 +414,10 @@ export default class InGameView extends React.Component {
                     </div>
                 </div>
                 <div className='p-3'>
-                    {this.state.wordLastPlayed && !this.state.player1Active ?
-                        <Alert username={this.state.currentUser.displayName} word={this.state.wordLastPlayed} points={this.state.lastScore} /> : undefined}
-                    {this.state.wordLastPlayed && this.state.player1Active ?
-                        <Alert username='Guest' word={this.state.wordLastPlayed} points={this.state.lastScore} /> : undefined}
+                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) && !this.state.player1Active ?
+                        <Alert username={this.state.currentUser.displayName} word={this.state.wordLastPlayed} points={this.state.lastScore} shuffledLastTurn={this.state.shuffledLastTurn} /> : undefined}
+                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) && this.state.player1Active ?
+                        <Alert username='Guest' word={this.state.wordLastPlayed} points={this.state.lastScore} shuffledLastTurn={this.state.shuffledLastTurn} /> : undefined}
                     {this.state.error ?
                         <div className='alert alert-danger text-center mb-0'>
                             {this.state.error}
@@ -431,7 +435,7 @@ export default class InGameView extends React.Component {
                             Play Word
                         </button>
                     </div>
-                    <div className="ml-5 d-flex">
+                    <div className="mx-5 d-flex">
                         <div className="mr-2">
                             <button onClick={() => this.setState({
                                 placeTileMode: true,
@@ -453,9 +457,11 @@ export default class InGameView extends React.Component {
                                 Remove Tile
                             </button>
                         </div>
-                        <div className="ml-2">
-                            <button onClick={() => this.renderShuffled(true, true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-danger'>Shuffle Letters</button>
-                        </div>
+                    </div>
+                    <div className="ml-5">
+                        <button onClick={() => this.renderShuffled(true, true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-warning'>
+                            Shuffle Letters
+                        </button>
                     </div>
                 </div>
             </div>
