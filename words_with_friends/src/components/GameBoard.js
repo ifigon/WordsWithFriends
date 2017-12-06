@@ -431,6 +431,9 @@ export default class InGameView extends React.Component {
                                 Remove Tile
                             </button>
                         </div>
+                        <div className="ml-2">
+                            <button onClick={() => this.renderShuffled(true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-danger'>Shuffle Letters</button>
+                        </div>
                         <p> {this.state.tilesLeft} Tiles left </p>
                         {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
