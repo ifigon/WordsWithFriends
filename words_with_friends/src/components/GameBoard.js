@@ -7,7 +7,6 @@ import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
 import Tile from "./tile";
-import Countdown from 'react-countdown-now';
 
 const OXFORD_API_URL = "https://od-api.oxforddictionaries.com/api/v1"
 
