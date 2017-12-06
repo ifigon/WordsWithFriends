@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 import Alert from './Alert';
 
 const API_KEY = '?key=92de68e0-2615-460b-9152-16088d0944b7';
@@ -55,7 +55,44 @@ export default class InGameView extends React.Component {
         this.renderShuffled(true);
         this.finishSetUp();
     }
-
+    
+    
+    shuffleLetters = validTurn => {
+        let shuffledTiles = this.shuffle(letterTiles.tile);
+        let randomLetters = [];
+        let currentTiles = [];
+        this.state.player1Active ? currentTiles = this.state.user1Tiles : currentTiles = this.state.user2Tiles;
+        if (currentTiles.length === 7) {
+            for (let i = 0; i < 7; i++) {
+                let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+                let randomTile = shuffledTiles[randomSelect]
+                // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+                randomLetters.push(
+                    <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                )
+            } 
+            currentTiles = randomLetters;
+        } else {
+            for (let i = this.state.currentTiles.length; i < 7; i++) {
+                let randomSelect = Math.floor(Math.random() * shuffledTiles.length)
+                let randomTile = shuffledTiles[randomSelect]
+                // shuffledTiles = shuffledTiles.splice(randomSelect, 1);
+                randomLetters.push(
+                    <Tile key={Math.random() * i} callBack={this.selectUserTile} randomTile={randomTile} userTileSelected={this.state.userTileSelected} />
+                )
+            }
+            currentTiles = currentTiles.concat(randomLetters);
+        }
+        this.state.player1Active ? this.setState({ user1Tiles: currentTiles }) : 
+        this.setState({ user2Tiles: currentTiles });  
+        this.setState({ tilesPlacedThisTurn : [] });  
+        if (this.state.player1Active && this.state.turnNumber === 3) {
+            let winner = this.state.currentUser.displayName;
+            this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
+            alert("Game over! " + winner + " won the game!");
+        }
+    }
+    
     renderShuffled = validTurn => {
         console.log("test");
         if (validTurn) {
@@ -65,7 +102,7 @@ export default class InGameView extends React.Component {
             let randomLetters = this.buildUpTiles(tileNumber);
             let currentTiles = undefined;
             this.state.player1Active ? currentTiles = this.state.user1Tiles : currentTiles = this.state.user2Tiles;
-            currentTiles = currentTiles.concat(randomLetters);
+            currentTiles = currentTiles.concat(randomLetters);  
             if (this.state.player1Active) {
                 this.setState({ user1Tiles: currentTiles });
             } else {
@@ -244,7 +281,11 @@ export default class InGameView extends React.Component {
                 }
             }
         }
+        
+
     }
+
+
 
     /** 
      * Uses the dictionary api to check if the passed in word is valid
@@ -382,6 +423,9 @@ export default class InGameView extends React.Component {
                         </div>
                     </div>
                     <div>
+                        <span>Turn Number: {this.state.turnNumber}</span>
+                    </div>
+                    <div>
                         <button onClick={() => this.handleSignOut()} type='button' className='btn btn-dark'>
                             Sign Out
                         </button>
@@ -430,6 +474,9 @@ export default class InGameView extends React.Component {
                                 className='btn btn-danger'>
                                 Remove Tile
                             </button>
+                        </div>
+                        <div className="ml-2">
+                            <button onClick={() => this.shuffleLetters(true)} disabled={this.state.tilesPlacedThisTurn.length !== 0 || this.state.placeTileMode === false} className='btn btn-danger'>Shuffle Letters</button>
                         </div>
                         <p> {this.state.tilesLeft} Tiles left </p>
                         {/* {shuffledTiles.length} This has to go inside <P>*/}
