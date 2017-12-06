@@ -6,7 +6,7 @@ import letterTiles from '../tiles';
 import tileValues from '../tilevalues';
 
 import BoardTile from "./BoardTile";
-import Tile from "./Tile";
+import Tile from "./tile";
 import Alert from './Alert';
 
 const API_KEY = '?key=92de68e0-2615-460b-9152-16088d0944b7';
@@ -41,7 +41,6 @@ export default class InGameView extends React.Component {
             user1Tiles: [],
             user2Tiles: [],
             tilesPlacedThisTurn: [],
-            tilesLeft: letterTiles.tile.length, //Need to update tiles left
             score1: 0,
             score2: 0,
             player1Active: false,
@@ -52,20 +51,26 @@ export default class InGameView extends React.Component {
     }
 
     componentDidMount() {
-        this.renderShuffled(true);
-        this.finishSetUp();
+        this.renderShuffled(true, false);
+        let randomLetters = this.buildUpTiles(0);
+        this.setState({ user1Tiles: randomLetters });    
     }
 
-    renderShuffled = validTurn => {
-        console.log("test");
+    renderShuffled = (validTurn, resetTiles) => {
         if (validTurn) {
             let newTurnNumber = this.state.turnNumber + 1;
             let tileNumber = 0;
-            this.state.player1Active ? tileNumber = this.state.user1Tiles.length : tileNumber = this.state.user2Tiles.length;
+            if(!resetTiles) {
+                this.state.player1Active ? tileNumber = this.state.user1Tiles.length : tileNumber = this.state.user2Tiles.length;
+            }
             let randomLetters = this.buildUpTiles(tileNumber);
             let currentTiles = undefined;
             this.state.player1Active ? currentTiles = this.state.user1Tiles : currentTiles = this.state.user2Tiles;
-            currentTiles = currentTiles.concat(randomLetters);
+            if(!resetTiles) {
+                currentTiles = currentTiles.concat(randomLetters);
+            } else {
+                currentTiles = randomLetters;
+            }
             if (this.state.player1Active) {
                 this.setState({ user1Tiles: currentTiles });
             } else {
@@ -82,16 +87,16 @@ export default class InGameView extends React.Component {
                 }
             }
             let newTurn = !this.state.player1Active;
+            this.setState({ userTileSelected : false });
+            this.setState({ userLetter : undefined});
+            this.setState({ placeTileMode : true});
+            this.setState({ error : undefined });
             this.setState({ player1Active: newTurn });
             this.setState({ turnNumber: this.state.turnNumber + 1 });
+            console.log(this.state.userTileSelected);
         } else {
             this.setState({ error: 'No valid words found' });
         }
-    }
-
-    finishSetUp() {
-        let randomLetters = this.buildUpTiles(0);
-        this.setState({ user1Tiles: randomLetters });
     }
 
     buildUpTiles(init) {
@@ -198,6 +203,7 @@ export default class InGameView extends React.Component {
      */
     checkWord() {
         this.setState({ error: '', wordLastPlayed: '' });
+        let wordFound = false;
 
         /** 
          * Goes left to right through each coordinate one by one, for example starts at 0,0
@@ -216,6 +222,7 @@ export default class InGameView extends React.Component {
                 }
                 if (letter === "-" || xCoord === 11) {
                     if (possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
+                        wordFound = true;
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
                     }
@@ -237,12 +244,16 @@ export default class InGameView extends React.Component {
                 }
                 if (letter === "-" || yCoord === 11) {
                     if (possibleWord.length > 1 && !this.state.usedWords.includes(possibleWord)) {
+                        wordFound = true;
                         this.state.usedWords.push(possibleWord);
                         this.fetchWord(possibleWord);
                     }
                     possibleWord = "";
                 }
             }
+        }
+        if(!wordFound) {
+            this.setState({ error: 'No valid words found' });        
         }
     }
 
@@ -265,7 +276,6 @@ export default class InGameView extends React.Component {
     handleXML(data) {
         if (data && data.getElementsByTagName('ew')[0] !== undefined) {
             let word = data.getElementsByTagName('ew')[0].childNodes[0].nodeValue;
-            console.log('word in dictionary ' + word);
             return word;
         } else {
             return "";
@@ -432,10 +442,8 @@ export default class InGameView extends React.Component {
                             </button>
                         </div>
                         <div className="ml-2">
-                            <button onClick={() => this.renderShuffled(true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-danger'>Shuffle Letters</button>
+                            <button onClick={() => this.renderShuffled(true, true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-danger'>Shuffle Letters</button>
                         </div>
-                        <p> {this.state.tilesLeft} Tiles left </p>
-                        {/* {shuffledTiles.length} This has to go inside <P>*/}
                     </div>
                 </div>
             </div>
