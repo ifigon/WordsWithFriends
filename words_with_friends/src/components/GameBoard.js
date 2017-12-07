@@ -118,12 +118,20 @@ export default class InGameView extends React.Component {
              * Resets the state of a bunch of different things to prepare for the next turn
              */
             let newTurn = !this.state.player1Active;
-            this.setState({ userTileSelected : false });
-            this.setState({ userLetter : undefined});
-            this.setState({ placeTileMode : true});
-            this.setState({ error : undefined });
-            this.setState({ player1Active: newTurn });
-            this.setState({ turnNumber: this.state.turnNumber + 1 });
+            this.setState({
+                userTileSelected: false,
+                userLetter: undefined,
+                placeTileMode: true,
+                error: undefined,
+                player1Active: newTurn,
+                turnNumber: this.state.turnNumber + 1
+            });
+            // this.setState({ userTileSelected : false });
+            // this.setState({ userLetter : undefined});
+            // this.setState({ placeTileMode : true});
+            // this.setState({ error : undefined });
+            // this.setState({ player1Active: newTurn });
+            // this.setState({ turnNumber: this.state.turnNumber + 1 });
             this.checkIfGameOver();
         } else {
             this.setState({ error: 'No valid words found' });
@@ -469,9 +477,11 @@ export default class InGameView extends React.Component {
                     </div>
                 </div>
                 <div className='p-3'>
-                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) && !this.state.player1Active ?
+                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) 
+                    && !this.state.player1Active && !this.state.error ?
                         <Alert username={this.state.currentUser.displayName} word={this.state.wordLastPlayed} points={this.state.lastScore} shuffledLastTurn={this.state.shuffledLastTurn} /> : undefined}
-                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) && this.state.player1Active ?
+                    {(this.state.wordLastPlayed || this.state.shuffledLastTurn) 
+                    && this.state.player1Active && !this.state.error ?
                         <Alert username='Guest' word={this.state.wordLastPlayed} points={this.state.lastScore} shuffledLastTurn={this.state.shuffledLastTurn} /> : undefined}
                     {this.state.error ?
                         <div className='alert alert-danger text-center mb-0'>
@@ -514,7 +524,9 @@ export default class InGameView extends React.Component {
                         </div>
                     </div>
                     <div className="ml-5">
-                        <button onClick={() => this.renderShuffled(true, true)} disabled={this.state.tilesPlacedThisTurn.length !== 0} className='btn btn-warning'>
+                        <button onClick={() => this.renderShuffled(true, true)} 
+                            disabled={this.state.tilesPlacedThisTurn.length !== 0} 
+                            className='btn btn-warning'>
                             Shuffle Letters
                         </button>
                     </div>
