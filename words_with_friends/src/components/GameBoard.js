@@ -126,12 +126,6 @@ export default class InGameView extends React.Component {
                 player1Active: newTurn,
                 turnNumber: this.state.turnNumber + 1
             });
-            // this.setState({ userTileSelected : false });
-            // this.setState({ userLetter : undefined});
-            // this.setState({ placeTileMode : true});
-            // this.setState({ error : undefined });
-            // this.setState({ player1Active: newTurn });
-            // this.setState({ turnNumber: this.state.turnNumber + 1 });
             this.checkIfGameOver();
         } else {
             this.setState({ error: 'No valid words found' });
