@@ -1,3 +1,8 @@
+/** 
+ * Words with Friends!
+ * Ian Figon, Charlye Castro, Wynston Hsu, Christian Hahn
+ */
+
 import React, { Component } from 'react';
 import { HashRouter as Router, Switch, Redirect, Route } from 'react-router-dom';
 import SignUpView from './components/SignUp';

@@ -1,3 +1,9 @@
+/** 
+ * Used as an alert each time a turn ends to update the user with what happened
+ * during the turn, such as whether it was a valid or invalid turn or whether
+ * the user shuffled their tiles
+ */
+
 import React from 'react';
 
 export default class Alert extends React.Component {

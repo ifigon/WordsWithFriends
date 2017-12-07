@@ -1,3 +1,7 @@
+/** 
+ * Signing in to a words with friends account
+ */
+
 import React from 'react';
 import firebase from 'firebase/app';
 import Input from './Input.js';

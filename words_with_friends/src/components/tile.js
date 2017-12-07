@@ -1,3 +1,7 @@
+/** 
+ * Tiles in the user inventory
+ */
+
 import React from "react";
 
 export default class Tile extends React.Component {

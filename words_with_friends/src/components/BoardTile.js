@@ -1,7 +1,8 @@
+/** 
+ * Every tile on the actual game board
+ */
+
 import React from 'react';
-import firebase from 'firebase/app';
-import { Redirect } from 'react-router-dom';
-import constants from './constants';
 
 export default class BoardTile extends React.Component {
     constructor(props) {
@@ -14,7 +15,13 @@ export default class BoardTile extends React.Component {
         }
     }
 
+    /** 
+    * Updates the state when a tile is placed
+    */
     handleTilePlace(evt) {
+        /** 
+         * If the user is in place tile mode, a tile is placed and this board tile is updated
+         */   
         if(this.props.placeTileMode && !this.state.tilePlaced) {
             this.setState({ tilePlaced : true });
             evt.classList.add('glass');

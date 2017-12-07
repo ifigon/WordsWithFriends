@@ -1,3 +1,7 @@
+/** 
+ * Signing Up for a Words with Friends Account
+ */
+
 import React from 'react';
 import firebase from 'firebase/app';
 import Input from './Input.js';
@@ -30,7 +34,7 @@ export default class SignUpView extends React.Component {
     handleSubmit(evt) {
         evt.preventDefault();
         this.setState({ error: '' });
-        if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))) {
+        if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))) {
             this.setState({ error: 'Please provide a valid email.' });
         }
         if (this.state.password !== this.state.confirm) {

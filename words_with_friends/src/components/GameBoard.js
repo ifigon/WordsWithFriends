@@ -1,3 +1,8 @@
+/** 
+ * Words with Friends!
+ * Ian Figon, Charlye Castro, Wynston Hsu, Christian Hahn
+ */
+
 import React from 'react';
 import firebase from 'firebase/app';
 import { Redirect } from 'react-router-dom';
@@ -50,17 +55,33 @@ export default class InGameView extends React.Component {
             error: '',
         };
     }
-    
+
+    /** 
+     * Initializes user inventories and begins the game
+     */
     componentDidMount() {
         this.renderShuffled(true, false);
         let randomLetters = this.buildUpTiles(0);
         this.setState({ user1Tiles: randomLetters });    
     }
 
+    /** 
+     * Called at the end of each turn. Adds new tiles to the users inventory, and swaps
+     * the turn from the current active player to the other
+     */
     renderShuffled = (validTurn, resetTiles) => {
+        /** 
+         * If a word is found, then it is a valid turn and the code to prepare for the next
+         * turn is executed. If no words are found then the turn isn't changed and it 
+         * gives an alert that the user must try again
+         */
         if (validTurn) {
             let newTurnNumber = this.state.turnNumber + 1;
             let tileNumber = 0;
+            /** 
+             * Refills the users inventory with however many tiles they need to maintain 7
+             * tiles at the beginning of each turn
+             */
             if(!resetTiles) {
                 this.state.player1Active ? tileNumber = this.state.user1Tiles.length : tileNumber = this.state.user2Tiles.length;
             }
@@ -80,6 +101,9 @@ export default class InGameView extends React.Component {
                 this.setState({ user2Tiles: currentTiles });
             }
             this.setState({ tilesPlacedThisTurn: [] });
+            /** 
+             * Swaps the yellow text over from whoevers turn it is now to the next turn
+             */
             if (newTurnNumber > 1) {
                 if (this.state.player1Active) {
                     document.querySelector("#user1").classList.remove("yellow-text");
@@ -90,6 +114,9 @@ export default class InGameView extends React.Component {
                     this.setState({remainingTurns: this.state.remainingTurns - 1});
                 }
             }
+            /** 
+             * Resets the state of a bunch of different things to prepare for the next turn
+             */
             let newTurn = !this.state.player1Active;
             this.setState({ userTileSelected : false });
             this.setState({ userLetter : undefined});
@@ -103,6 +130,9 @@ export default class InGameView extends React.Component {
         }
     }
 
+    /** 
+     * Adds new random tiles to the users inventory if they need them
+     */
     buildUpTiles(init) {
         let randomLetters = [];
         let shuffledTiles = this.shuffle(letterTiles.tile);
@@ -116,11 +146,19 @@ export default class InGameView extends React.Component {
         return randomLetters;
     }
 
+    /** 
+     * Checks if the game is over, if it is then it displays who won and 
+     * prompts the user to start a new game
+     */
     checkIfGameOver() {
         if (this.state.turnNumber === 30) {
-            let winner = this.state.currentUser.displayName;
-            this.state.score1 > this.state.score2 ? winner = this.state.currentUser.displayName : winner = "Guest";
-            alert("Game over! " + winner + " won the game! Want to play another game?");
+            if(this.state.score1 > this.state.score2) {
+                alert("Game over! " + this.state.currentUser.displayName + " won the game! Want to play another game?");                
+            } else if(this.state.score1 < this.state.score2) {
+                alert("Game over! Guest won the game! Want to play another game?");                
+            } else {
+                alert("Game over! The game was a tie, better luck next time! Want to play another game?");                                
+            }
             document.addEventListener("keydown", window.location.reload());
         }
     }
@@ -153,7 +191,9 @@ export default class InGameView extends React.Component {
         /** 
          * Updates the state of the board after user places a tile
          */
-        this.state.placeTileMode ? this.setState({ userTileSelected: false }) : undefined;
+        if(this.state.placeTileMode) {
+            this.setState({ userTileSelected: false });
+        }
         let newBoard = this.state.letterBoard;
         if (this.state.placeTileMode) {
             /** 
@@ -190,6 +230,11 @@ export default class InGameView extends React.Component {
         this.setState({ letterBoard: newBoard });
     }
 
+    /** 
+     * Updates the user inventory when a tile is placed by removing it from their inventory
+     * and storing it to ensure that users can only remove tiles and place them back into their
+     * inventory if they were put down this turn
+     */
     updateInventory(userTiles) {
         for (let i = 0; i < userTiles.length; i++) {
             let tileFound = false;
@@ -310,6 +355,9 @@ export default class InGameView extends React.Component {
                 oldScore = this.state.score2;
             }
             let wordScore = 0;
+            /** 
+             * Builds up the word score 
+             */
             for (let i = 0; i < word.length; i++) {
                 let character = word.charAt(i);
                 let characterValue = tileValues.tileValues[character];
@@ -317,6 +365,9 @@ export default class InGameView extends React.Component {
             }
             this.setState({ lastScore: wordScore });
             let newScore = 0;
+            /** 
+             * Updates the user score with the new word score added
+             */
             if (this.state.player1Active) {
                 newScore = this.state.score1 + wordScore;
                 this.setState({ score1: newScore });
@@ -330,6 +381,11 @@ export default class InGameView extends React.Component {
         }
     }
 
+    /** 
+     * Makes sure that the word passed in is only alphabetic characters,
+     * non alphabetic characters returned by the dictionary api call are not
+     * allowed
+     */
     isAlphabetic(word) {
         for (let i = 0; i < word.length; i++) {
             let character = word.charAt(i);
@@ -383,15 +439,14 @@ export default class InGameView extends React.Component {
         /**
          * Gets the initials of the current user to be displayed in the scoreboard
          */
-        /*need to fix timer so that it does not reset everytime user invokes change in state*/
-        let userInitial = this.state.currentUser.displayName.charAt(0);
+        //let userInitial = this.state.currentUser.displayName.charAt(0);
 
         return (
             <div className='container'>
                 <div className='row justify-content-between banner'>
                     <h1>Words With Friendz</h1>
                     <div className='d-flex'>
-                        <div className='user text-center'>{userInitial}</div>
+                        <div className='user text-center'>{this.state.currentUser.displayName ? this.state.currentUser.displayName.charAt(0) : "U"}</div>
                         <div id='user1' className='yellow-text'>
                             <p>{this.state.currentUser.displayName}</p>
                             <h5 id="score1">{this.state.score1}</h5>

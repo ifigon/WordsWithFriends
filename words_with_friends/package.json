@@ -1,5 +1,6 @@
 {
   "name": "words_with_friends",
+  "homepage": "https://info343d-a17.github.io/group-ifigon/words_with_friends/build",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
